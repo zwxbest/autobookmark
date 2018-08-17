@@ -17,36 +17,88 @@ import java.util.List;
  */
 public class TextExtractionStategyWithSize implements TextExtractionStrategy {
 
-    List<BookmarkWithFontSize> bookmarkWithFontSizes=new ArrayList<BookmarkWithFontSize>();
 
-    private float fontSize;
+    private Float lastyBottom = -1f;
 
-    public TextExtractionStategyWithSize(List<BookmarkWithFontSize> bookmarkWithFontSizes)
-    {
-        this.bookmarkWithFontSizes=bookmarkWithFontSizes;
+    private Float lastFontSize = -1f;
+
+    private Float lastyTop = -1f;
+
+    /**
+     * lastyBottom保存的是上一行文本书签，lastPlainBottom保存的是文本的bottom，
+     * 用来判断是否换行，换行了就重置startOfLine，当找到第一个大字号字体的字时，如果并非一行的开头，就不加入。
+     */
+    private Float lastPlainBottom = -1f;
+
+
+    private StrategyWithFontSizeDto dto;
+
+    //不大于正文字体的文字在这一行的位置
+    private int startMainBodySizeOfLine;
+
+
+    public TextExtractionStategyWithSize(StrategyWithFontSizeDto dto) {
+        this.dto = dto;
     }
 
     public String getResultantText() {
+
+        if(!dto.getSb().toString().equals(""))
+        {
+            dto.getBookmarkWithFontSizes().add(new BookmarkWithFontSize(dto.getSb().toString(), lastFontSize, lastyTop / dto.getPageHeight()));
+        }
         return "";
     }
 
     public void beginTextBlock() {
-
     }
 
+    /**
+     * 这里是一个一个字进来的，会被调用多次，最后返给getResultantText
+     *
+     * @param renderInfo
+     */
     public void renderText(TextRenderInfo renderInfo) {
+        //这一行的底线位置
+        float yBottom = renderInfo.getBaseline().getStartPoint().get(Vector.I2);
+        //计算fontSize的位置
+        float yDesc = renderInfo.getDescentLine().getStartPoint().get(Vector.I2);
+        //这一行的顶线位置
+        float yTop = renderInfo.getAscentLine().getEndPoint().get(Vector.I2);
+        String text = renderInfo.getText();
+        Float fontSize = (float) Math.round(yTop - yDesc);
+        //比正文字体大，作为书签
 
-        //This code assumes that if the baseline changes then we're on a newline
-        Vector curBaseline = renderInfo.getDescentLine().getStartPoint();
-        Vector topRight = renderInfo.getAscentLine().getEndPoint();
-        Rectangle rect = new Rectangle(curBaseline.get(Vector.I1), curBaseline.get(Vector.I2), topRight.get(Vector.I1), topRight.get(Vector.I2));
-        String text=renderInfo.getText();
-        float fontSize = rect.getHeight();
-        bookmarkWithFontSizes.add(new BookmarkWithFontSize(text,fontSize));
+        if (!lastPlainBottom.equals(-1f) && !lastPlainBottom.equals(yBottom)) {
+            startMainBodySizeOfLine = 0;
+        }
+
+        if (fontSize.compareTo(dto.getMainBodySize()) > 0) {
+
+            if (!lastyBottom.equals(-1f) && !lastyBottom.equals(yBottom)) {
+
+                dto.getBookmarkWithFontSizes().add(new BookmarkWithFontSize(dto.getSb().toString(), lastFontSize, lastyTop / dto.getPageHeight()));
+                dto.setSb(new StringBuilder());
+            }
+
+            if (startMainBodySizeOfLine == 0) {
+                lastFontSize = fontSize;
+                lastyTop = yTop;
+                lastyBottom = yBottom;
+                dto.getSb().append(text);
+            }
+
+        } else {
+//            if (!lastPlainBottom.equals(-1f) && !lastPlainBottom.equals(yBottom)) {
+//                startMainBodySizeOfLine = 0;
+//            }
+            startMainBodySizeOfLine++;//这一行的第几个字，只有从第一个开始才算取章节
+            lastPlainBottom = yBottom;
+        }
+
     }
 
     public void endTextBlock() {
-
     }
 
     public void renderImage(ImageRenderInfo renderInfo) {

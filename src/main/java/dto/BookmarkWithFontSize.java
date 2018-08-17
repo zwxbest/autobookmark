@@ -2,6 +2,7 @@ package dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 /**
@@ -20,4 +21,6 @@ public class BookmarkWithFontSize {
     private String bookmark;
 
     private float fontSize;
+
+    private float yOffsetPercent;
 }
