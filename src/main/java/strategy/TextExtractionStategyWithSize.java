@@ -24,6 +24,8 @@ public class TextExtractionStategyWithSize implements TextExtractionStrategy {
 
     private Float lastyTop = -1f;
 
+    private StringBuilder sb=new StringBuilder();
+
     /**
      * lastyBottom保存的是上一行文本书签，lastPlainBottom保存的是文本的bottom，
      * 用来判断是否换行，换行了就重置startOfLine，当找到第一个大字号字体的字时，如果并非一行的开头，就不加入。
@@ -43,9 +45,9 @@ public class TextExtractionStategyWithSize implements TextExtractionStrategy {
 
     public String getResultantText() {
 
-        if(!dto.getSb().toString().equals(""))
+        if(!sb.toString().equals(""))
         {
-            dto.getBookmarkWithFontSizes().add(new BookmarkWithFontSize(dto.getSb().toString(), lastFontSize, lastyTop / dto.getPageHeight()));
+            dto.getBookmarkWithFontSizes().add(new BookmarkWithFontSize(sb.toString(), lastFontSize, lastyTop,dto.getPageNo()));
         }
         return "";
     }
@@ -76,16 +78,18 @@ public class TextExtractionStategyWithSize implements TextExtractionStrategy {
         if (fontSize.compareTo(dto.getMainBodySize()) > 0) {
 
             if (!lastyBottom.equals(-1f) && !lastyBottom.equals(yBottom)) {
-
-                dto.getBookmarkWithFontSizes().add(new BookmarkWithFontSize(dto.getSb().toString(), lastFontSize, lastyTop / dto.getPageHeight()));
-                dto.setSb(new StringBuilder());
+                if(!sb.toString().equals(""))
+                {
+                    dto.getBookmarkWithFontSizes().add(new BookmarkWithFontSize(sb.toString(), lastFontSize, lastyTop,dto.getPageNo()));
+                }
+                sb=new StringBuilder();
             }
 
             if (startMainBodySizeOfLine == 0) {
                 lastFontSize = fontSize;
                 lastyTop = yTop;
                 lastyBottom = yBottom;
-                dto.getSb().append(text);
+                sb.append(text);
             }
 
         } else {

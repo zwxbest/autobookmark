@@ -20,7 +20,9 @@ public class BookmarkWithFontSize {
 
     private String bookmark;
 
-    private float fontSize;
+    private Float fontSize;
 
-    private float yOffsetPercent;
+    private float yOffset;
+
+    private int pageNum;
 }

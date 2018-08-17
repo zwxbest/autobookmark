@@ -1,8 +1,12 @@
 import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.parser.PdfTextExtractor;
+import dto.BookmarkWithFontSize;
+import po.BookmarkWithLevel;
 import strategy.TextExtractionStategyWithSize;
+import utils.BookmarkConveter;
 import utils.PdfUtils;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -15,19 +19,18 @@ public class Application {
 
     public static void main(String[] args) throws Exception {
 
-        PdfReader reader = new PdfReader("F:\\坚果云\\PDF\\Java\\ElasticSearch\\深入理解ElasticSearch .pdf");
+        File srcFile=new File("E:\\PDF\\Java\\Spring\\精通Spring+4.x++企业应用开发实战.pdf");
+        String dest=srcFile.getParent()+"\\"+srcFile.getName().replaceAll("\\.pdf","").concat("-提取书签").concat(".pdf");
+                PdfReader reader = new PdfReader(srcFile.getPath());
 
-//        PdfUtils.getBookmarkWithFontSize(reader);
-        List<Object> o = Arrays.asList(1, "o", new Date());
-            aa(o.toArray());
+        List<BookmarkWithFontSize> bookmarkWithFontSize = PdfUtils.getBookmarkWithFontSize(reader);
 
+        //转换为带层级的
+        List<BookmarkWithLevel> bookmarkWithLevels = BookmarkConveter.convertDtoToPo(bookmarkWithFontSize);
+
+        //写入书签
+        PdfUtils.createBookmarks(bookmarkWithLevels,reader,dest);
 
     }
 
-    public static void  aa(Object ...a)
-    {
-        for (Object o : a) {
-            System.out.println(o);
-        }
-    }
 }

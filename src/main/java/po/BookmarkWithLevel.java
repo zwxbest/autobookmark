@@ -17,11 +17,16 @@ public class BookmarkWithLevel {
      * 书签
      */
     String title;
-
     /**
-     * 孩子
+     * parent
      */
-    List<BookmarkWithLevel> children;
+    BookmarkWithLevel parent;
+    /**
+     * 偏移
+     */
+    float yOffset;
 
-    float yOffsetPercent;
+    Float fontSize;
+
+    private int pageNum;
 }

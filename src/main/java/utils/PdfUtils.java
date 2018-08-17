@@ -1,12 +1,15 @@
 package utils;
 
-import com.itextpdf.text.pdf.PdfReader;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.pdf.*;
 import com.itextpdf.text.pdf.parser.PdfTextExtractor;
 import dto.BookmarkWithFontSize;
+import po.BookmarkWithLevel;
 import strategy.StrategyWithFontSizeDto;
 import strategy.TextExtractionStategyFindMainSize;
 import strategy.TextExtractionStategyWithSize;
 
+import java.io.FileOutputStream;
 import java.util.*;
 import java.util.concurrent.Executors;
 
@@ -31,17 +34,15 @@ public class PdfUtils {
        StringBuilder sb=new StringBuilder();
 
        StrategyWithFontSizeDto dto=new StrategyWithFontSizeDto();
-       for(int i=30;i<=40;i++)
+       for(int i=1;i<=numberOfPages;i++)
        {
 
            dto.setMainBodySize(mainBodySize);
-           dto.setSb(new StringBuilder());
            dto.setPageHeight(reader.getPageSize(i).getHeight());
-//           dto.setPageNo(i);
+           dto.setPageNo(i);
 
            TextExtractionStategyWithSize stategyWithSize = new TextExtractionStategyWithSize(dto);
-           String sbString=   PdfTextExtractor.getTextFromPage(reader, i, stategyWithSize);
-//           sb.append(sbString);
+            PdfTextExtractor.getTextFromPage(reader, i, stategyWithSize);
        }
        return dto.getBookmarkWithFontSizes();
    }
@@ -85,6 +86,38 @@ public class PdfUtils {
             }
         }
       return mainFontSize;
+    }
+
+    public static void createBookmarks(List<BookmarkWithLevel> booksmarks, PdfReader reader, String dest) throws Exception {
+        Document document = new Document();
+        PdfCopy copy = new PdfCopy(document, new FileOutputStream(dest));
+        document.open();
+
+        PdfOutline root = copy.getRootOutline();
+
+        copy.addDocument(reader);
+
+        PdfAction action;
+        copy.freeReader(reader);
+        Map<BookmarkWithLevel, PdfOutline> maps = new HashMap<>();
+        PdfOutline outline=null;
+        PdfOutline parent=root;
+        for (BookmarkWithLevel bookMark : booksmarks) {
+            //*1.1f是想上面露一点，要不太贴着文字了。
+            action = PdfAction.gotoLocalPage(bookMark.getPageNum(), new PdfDestination(
+                    PdfDestination.XYZ, -1,bookMark.getYOffset()*1.05f, 0), copy);
+            if(bookMark.getParent()!=null)
+                parent=maps.get(bookMark.getParent());
+            else
+                parent=root;
+            outline = new PdfOutline(parent, action, bookMark.getTitle(), false);
+            maps.put(bookMark, outline);
+        }
+        reader.close();
+        copy.flush();
+        copy.close();
+        document.close();
+
     }
 
 }
