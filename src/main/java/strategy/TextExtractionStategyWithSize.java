@@ -1,6 +1,7 @@
 package strategy;
 
 import com.itextpdf.text.Rectangle;
+import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.parser.ImageRenderInfo;
 import com.itextpdf.text.pdf.parser.TextExtractionStrategy;
 import com.itextpdf.text.pdf.parser.TextRenderInfo;
@@ -70,6 +71,7 @@ public class TextExtractionStategyWithSize implements TextExtractionStrategy {
         String text = renderInfo.getText();
         Float fontSize = (float) Math.round(yTop - yDesc);
         //比正文字体大，作为书签
+//        System.out.println(renderInfo.getFont().getFontDescriptor(BaseFont.FONT_WEIGHT,1000));
 
         if (!lastPlainBottom.equals(-1f) && !lastPlainBottom.equals(yBottom)) {
             startMainBodySizeOfLine = 0;

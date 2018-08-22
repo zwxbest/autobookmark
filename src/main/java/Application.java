@@ -19,7 +19,9 @@ public class Application {
 
     public static void main(String[] args) throws Exception {
 
-        File srcFile=new File("E:\\PDF\\Java\\Spring\\精通Spring+4.x++企业应用开发实战.pdf");
+        String srcParent="E:\\PDF2\\微服务";
+        String fileName="分布式服务框架原理与实践_李林锋著.pdf";
+        File srcFile=new File(srcParent,fileName);
         String dest=srcFile.getParent()+"\\"+srcFile.getName().replaceAll("\\.pdf","").concat("-提取书签").concat(".pdf");
                 PdfReader reader = new PdfReader(srcFile.getPath());
 

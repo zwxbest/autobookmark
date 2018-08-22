@@ -1,6 +1,8 @@
 package po;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
@@ -11,6 +13,8 @@ import java.util.List;
  */
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class BookmarkWithLevel {
 
     /**
@@ -29,4 +33,7 @@ public class BookmarkWithLevel {
     Float fontSize;
 
     private int pageNum;
+
+
+    private List<BookmarkWithLevel> childs;
 }

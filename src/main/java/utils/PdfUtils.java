@@ -4,6 +4,7 @@ import com.itextpdf.text.Document;
 import com.itextpdf.text.pdf.*;
 import com.itextpdf.text.pdf.parser.PdfTextExtractor;
 import dto.BookmarkWithFontSize;
+import jdk.nashorn.internal.runtime.regexp.joni.Regex;
 import po.BookmarkWithLevel;
 import strategy.StrategyWithFontSizeDto;
 import strategy.TextExtractionStategyFindMainSize;
@@ -79,7 +80,7 @@ public class PdfUtils {
         for(Float key:fontSizeCountMap.keySet())
         {
            float count= fontSizeCountMap.get(key);
-            if(count/sumCount>0.01)
+            if(count/sumCount>0.02)
             {
                 mainFontSize=key;
                 break;
@@ -118,6 +119,44 @@ public class PdfUtils {
         copy.close();
         document.close();
 
+    }
+
+    public static void converterBookmarks(List<HashMap<String, Object>> bookmarks,List<BookmarkWithLevel> bookmarkWithLevels,BookmarkWithLevel parent) throws Exception {
+
+        for (HashMap<String, Object> bookmark : bookmarks) {
+            List<HashMap<String, Object>> kids= (List<HashMap<String, Object>>)bookmark.get("Kids");
+            String[] pageinfo=bookmark.get("Page").toString().split(" ");
+            BookmarkWithLevel level=new BookmarkWithLevel(bookmark.get("Title").toString(),parent,Float.valueOf(pageinfo[3]) ,null,Integer.valueOf(pageinfo[0]),new ArrayList<>());
+
+            if(parent!=null)
+            {
+                parent.getChilds().add(level);
+            }
+            bookmarkWithLevels.add(level);
+            if(kids==null){
+                 continue;
+            }
+            else {
+                converterBookmarks(kids,bookmarkWithLevels,level);
+            }
+        }
+    }
+
+    public static List<BookmarkWithLevel>  filterBookmarks(List<BookmarkWithLevel> bookmarkWithLevels,String regex)
+    {
+        List<BookmarkWithLevel> bookmarkWithLevels1=new ArrayList<>();
+        for (BookmarkWithLevel bookmarkWithLevel : bookmarkWithLevels) {
+            if(bookmarkWithLevel.getTitle().matches(regex))
+            {
+                for (BookmarkWithLevel withLevel : bookmarkWithLevel.getChilds()) {
+                    withLevel.setParent(bookmarkWithLevel.getParent());
+                }
+            }
+            else {
+                bookmarkWithLevels1.add(bookmarkWithLevel);
+            }
+        }
+        return bookmarkWithLevels1;
     }
 
 }
