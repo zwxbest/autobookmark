@@ -17,8 +17,8 @@ import java.util.List;
 public class RemoveBookmarksByRegex {
 
     public static void main(String[] args) throws Exception{
-        String parent="E:\\PDF2\\微服务";
-        String filename="分布式服务框架原理与实践_李林锋著-提取书签.pdf";
+        String parent="F:\\坚果云\\PDF\\Java\\Spring3";
+        String filename="Beginning.Spring-Spring入门经典.pdf";
         String regex="";
         File srcFile=new File(parent,filename);
         String dest=srcFile.getParent()+"\\"+srcFile.getName().replaceAll("\\.pdf","").concat("-清理书签").concat(".pdf");
@@ -26,7 +26,7 @@ public class RemoveBookmarksByRegex {
         List<HashMap<String, Object>> list = SimpleBookmark.getBookmark(reader);
         List<BookmarkWithLevel> levels=new ArrayList<>();
         PdfUtils.converterBookmarks(list,levels,null);
-        List<BookmarkWithLevel> bookmarkWithLevels = PdfUtils.filterBookmarks(levels, "•.*•");
+        List<BookmarkWithLevel> bookmarkWithLevels = PdfUtils.filterBookmarks(levels, "<");
         System.out.println(1);
     }
 }
