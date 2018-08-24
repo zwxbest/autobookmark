@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * Created by zwxbest on 2018/8/17.
  */
-public class BookmarkConveter {
+public class Conveter {
 
 
     public static List<BookmarkWithLevel> convertDtoToPo(List<BookmarkWithFontSize> bookmarkWithFontSizeList)
@@ -36,4 +36,5 @@ public class BookmarkConveter {
         }
         return bookmarkWithLevels;
     }
+
 }

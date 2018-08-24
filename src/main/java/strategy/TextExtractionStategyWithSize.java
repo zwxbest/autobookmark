@@ -1,17 +1,11 @@
 package strategy;
 
-import com.itextpdf.text.Rectangle;
-import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.parser.ImageRenderInfo;
 import com.itextpdf.text.pdf.parser.TextExtractionStrategy;
 import com.itextpdf.text.pdf.parser.TextRenderInfo;
 import com.itextpdf.text.pdf.parser.Vector;
-import com.sun.org.apache.bcel.internal.generic.LSTORE;
-import consts.BookmarkStarter;
+import consts.RegexConsts;
 import dto.BookmarkWithFontSize;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author zhangweixiao
@@ -47,7 +41,7 @@ public class TextExtractionStategyWithSize implements TextExtractionStrategy {
 
     public String getResultantText() {
 
-        if(!sb.toString().equals("")&& sb.toString().matches(BookmarkStarter.bookmarkStartRegex))
+        if(!sb.toString().equals("")&& sb.toString().matches(RegexConsts.bookmarkStartRegex))
 //        if(!sb.toString().equals(""))
         {
             dto.getBookmarkWithFontSizes().add(new BookmarkWithFontSize(sb.toString(), lastFontSize, lastyTop,dto.getPageNo()));
@@ -82,7 +76,7 @@ public class TextExtractionStategyWithSize implements TextExtractionStrategy {
         if (fontSize.compareTo(dto.getMainBodySize()) > 0) {
 
             if (!lastyBottom.equals(-1f) && !lastyBottom.equals(yBottom)) {
-                if(!sb.toString().equals("") && sb.toString().matches(BookmarkStarter.bookmarkStartRegex))
+                if(!sb.toString().equals("") && sb.toString().matches(RegexConsts.bookmarkStartRegex))
 //                if(!sb.toString().equals(""))
                 {
                     dto.getBookmarkWithFontSizes().add(new BookmarkWithFontSize(sb.toString(), lastFontSize, lastyTop,dto.getPageNo()));
