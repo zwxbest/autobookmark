@@ -50,14 +50,15 @@ public class CapitalConsts {
 
     public static String convertToInt(String name) {
         Set<String> strings1 = numbers.keySet();
+        String returnMark="";
         List<String> stringlist = new ArrayList<>(strings1);
         for (int i = stringlist.size() - 1; i >= 0; i--) {
             if (name.contains(stringlist.get(i))) {
-                name = name.replace(stringlist.get(i), numbers.get(stringlist.get(i)).toString());
+                returnMark = stringlist.get(i).toString();
                 break;
             }
         }
-        return name;
+        return returnMark;
     }
 
     public static void main(String[] args) {
