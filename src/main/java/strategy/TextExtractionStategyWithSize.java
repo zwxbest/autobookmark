@@ -4,8 +4,10 @@ import com.itextpdf.text.pdf.parser.ImageRenderInfo;
 import com.itextpdf.text.pdf.parser.TextExtractionStrategy;
 import com.itextpdf.text.pdf.parser.TextRenderInfo;
 import com.itextpdf.text.pdf.parser.Vector;
+import command.CommandLineHelper;
 import consts.RegexConsts;
 import dto.BookmarkWithFontSize;
+import javafx.application.Application;
 
 /**
  * @author zhangweixiao
@@ -41,7 +43,11 @@ public class TextExtractionStategyWithSize implements TextExtractionStrategy {
 
     public String getResultantText() {
 
-        if(!sb.toString().equals("")&& sb.toString().matches(RegexConsts.bookmarkStartRegex))
+        boolean isBookmark = !sb.toString().equals("");
+        if(CommandLineHelper.arg.getMode()== 1){
+            isBookmark&=sb.toString().matches(RegexConsts.bookmarkStartRegex);
+        }
+        if(isBookmark )
 //        if(!sb.toString().equals(""))
         {
             dto.getBookmarkWithFontSizes().add(new BookmarkWithFontSize(sb.toString(), lastFontSize, lastyTop,dto.getPageNo()));
@@ -65,7 +71,8 @@ public class TextExtractionStategyWithSize implements TextExtractionStrategy {
         //这一行的顶线位置
         float yTop = renderInfo.getAscentLine().getEndPoint().get(Vector.I2);
         String text = renderInfo.getText();
-        Float fontSize = (float) Math.round(yTop - yDesc);
+//        Float fontSize = (float) Math.round(yTop - yDesc);
+        Float fontSize = yTop - yDesc;
         //比正文字体大，作为书签
 //        System.out.println(renderInfo.getFont().getFontDescriptor(BaseFont.FONT_WEIGHT,1000));
 

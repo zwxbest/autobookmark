@@ -37,7 +37,8 @@ public class TextExtractionStategyFindMainSize implements TextExtractionStrategy
         float yDesc=renderInfo.getDescentLine().getStartPoint().get(Vector.I2);
         //这一行的顶线位置
         float yTop = renderInfo.getAscentLine().getEndPoint().get(Vector.I2);
-        float fontSize = Math.round(yTop - yDesc);
+//        float fontSize = Math.round(yTop - yDesc);
+        float fontSize = yTop - yDesc;
         Integer fontSizeCount = fontSizeCountMap.get(fontSize);
         if (fontSizeCount == null) {
             fontSizeCountMap.put(fontSize, 1);

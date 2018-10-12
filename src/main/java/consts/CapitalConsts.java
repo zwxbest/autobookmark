@@ -50,13 +50,19 @@ public class CapitalConsts {
 
     public static String convertToInt(String name) {
         Set<String> strings1 = numbers.keySet();
-        String returnMark="";
+        String returnMark = "";
+        boolean find = false;
         List<String> stringlist = new ArrayList<>(strings1);
         for (int i = stringlist.size() - 1; i >= 0; i--) {
-            if (name.contains(stringlist.get(i))) {
+            if (name.contains(
+                stringlist.get(i)) || name.contains(numbers.get(stringlist.get(i)).toString())) {
+                find = true;
                 returnMark = stringlist.get(i).toString();
                 break;
             }
+        }
+        if (find == false) {
+            return name;
         }
         return returnMark;
     }

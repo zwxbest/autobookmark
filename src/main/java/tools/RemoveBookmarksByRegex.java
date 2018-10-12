@@ -17,8 +17,8 @@ import java.util.List;
 public class RemoveBookmarksByRegex {
 
     public static void main(String[] args) throws Exception{
-        String parent="F:\\坚果云\\PDF\\Java\\Spring3";
-        String filename="Beginning.Spring-Spring入门经典.pdf";
+        String parent="F:\\坚果云\\PDF\\Java\\基础";
+        String filename="《Java核心技术 卷1 基础知识（原书第9版）》（完整中文版）.pdf";
         String regex="";
         File srcFile=new File(parent,filename);
         String dest=srcFile.getParent()+"\\"+srcFile.getName().replaceAll("\\.pdf","").concat("-清理书签").concat(".pdf");

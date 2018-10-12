@@ -28,8 +28,8 @@ public class Conveter {
                     .convertToInt(bookmarkWithLevels.get(j).getTitle());
                 //倒顺找到第一个比当前fontSize大的，认
                 boolean findParent = bookmarkWithFontSize.getFontSize()
-                    .compareTo(bookmarkWithLevels.get(j).getFontSize()) < 0
-                    && bookmarkWithFontSize.getBookmark().contains(numberTitle);
+                    .compareTo(bookmarkWithLevels.get(j).getFontSize()) < 0;
+//                    && bookmarkWithFontSize.getBookmark().contains(numberTitle);
                 if (findParent) {
                     bookmarkWithLevel.setParent(bookmarkWithLevels.get(j));
                     break;

@@ -20,8 +20,6 @@ import java.util.concurrent.Executors;
 public class PdfUtils {
 
 
-
-
     /**
      * 获取书签的List，包含FontSize,后续用来分层
      */
@@ -37,13 +35,12 @@ public class PdfUtils {
        StrategyWithFontSizeDto dto=new StrategyWithFontSizeDto();
        for(int i=1;i<=numberOfPages;i++)
        {
-
            dto.setMainBodySize(mainBodySize);
            dto.setPageHeight(reader.getPageSize(i).getHeight());
            dto.setPageNo(i);
 
            TextExtractionStategyWithSize stategyWithSize = new TextExtractionStategyWithSize(dto);
-            PdfTextExtractor.getTextFromPage(reader, i, stategyWithSize);
+           PdfTextExtractor.getTextFromPage(reader, i, stategyWithSize);
        }
        return dto.getBookmarkWithFontSizes();
    }
