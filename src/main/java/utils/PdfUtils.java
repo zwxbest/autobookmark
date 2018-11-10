@@ -3,6 +3,7 @@ package utils;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.pdf.*;
 import com.itextpdf.text.pdf.parser.PdfTextExtractor;
+import command.CommandLineHelper;
 import dto.BookmarkWithFontSize;
 import jdk.nashorn.internal.runtime.regexp.joni.Regex;
 import po.BookmarkWithLevel;
@@ -18,15 +19,18 @@ import java.util.concurrent.Executors;
  * @author zhangweixiao
  */
 public class PdfUtils {
-
-
     /**
      * 获取书签的List，包含FontSize,后续用来分层
      */
    public static List<BookmarkWithFontSize> getBookmarkWithFontSize(PdfReader reader) throws Exception
    {
        List<BookmarkWithFontSize> bookmarkWithFontSizes=new ArrayList<BookmarkWithFontSize>();
-       float mainBodySize= getMainBodyFontSize(reader);
+       float mainBodySize;
+       if(CommandLineHelper.arg.getSize()== null){
+           mainBodySize = getMainBodyFontSize(reader);
+       }else {
+           mainBodySize = CommandLineHelper.arg.getSize();
+       }
        //总页数
        int numberOfPages = reader.getNumberOfPages();
 

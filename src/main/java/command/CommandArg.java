@@ -11,4 +11,5 @@ import lombok.Setter;
 public class CommandArg {
     private int mode;
     private String fileName;
+    private Float size;
 }
