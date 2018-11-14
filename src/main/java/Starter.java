@@ -20,7 +20,7 @@ public class Starter {
         try {
             arg = CommandLineHelper.runCommand(args);
             File srcFile=new File(arg.getFileName());
-            String dest=srcFile.getParent()+"\\"+srcFile.getName().replaceAll("\\.pdf","").concat("(nizouba.com)").concat(".pdf");
+            String dest=srcFile.getParent()+"\\"+srcFile.getName().replaceAll("\\.pdf","").concat("-nizouba.com(你走吧)").concat(".pdf");
 
             PdfReader reader = new PdfReader(srcFile.getPath());
             List<BookmarkWithFontSize> bookmarkWithFontSize = PdfUtils.getBookmarkWithFontSize(reader);

@@ -45,10 +45,10 @@ public class CommandLineHelper {
         }
         String fileStr = cmd.getOptionValue("f");
         if(fileStr == null){
-            System.out.println("请输入文件路径");
+            System.out.println("请输入pdf文件路径");
             fileStr = scan();
         }
-        while ( !checkFileName(fileStr)){
+        while ((fileStr = checkFileName(fileStr))==null){
             fileStr=scan();
         }
         arg.setFileName(fileStr);
@@ -59,18 +59,28 @@ public class CommandLineHelper {
         return sc.nextLine();
     }
 
-    private static boolean checkFileName(String fileName){
+    private static String checkFileName(String fileName){
 
+        fileName =fileName.trim();
+        int startIndex =0,endIndex=fileName.length();
+        if(fileName.startsWith("\"")){
+            startIndex++;
+        }
+        if(fileName.endsWith("\"")){
+            endIndex--;
+        }
+        fileName = fileName.substring(startIndex,endIndex);
+        fileName =fileName.trim();
         if(!fileName.endsWith(".pdf")){
-            System.out.println("请输入pdf文件");
-            return false;
+            System.out.println("请输入pdf文件路径");
+            return null;
         }
         File file=new File(fileName);
         if(!file.exists()){
             System.out.println("文件不存在");
-            return false;
+            return null;
         }
-        return true;
+        return fileName;
 
     }
 
