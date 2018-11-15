@@ -1,6 +1,7 @@
 package utils;
 
 import com.itextpdf.text.Document;
+import com.itextpdf.text.Image;
 import com.itextpdf.text.pdf.*;
 import com.itextpdf.text.pdf.parser.PdfTextExtractor;
 import command.CommandLineHelper;
@@ -12,10 +13,12 @@ import strategy.TextExtractionStategyFindMainSize;
 import strategy.TextExtractionStategyWithSize;
 
 import java.io.FileOutputStream;
+import java.net.URL;
 import java.util.*;
 import java.util.concurrent.Executors;
 
 /**
+ *
  * @author zhangweixiao
  */
 public class PdfUtils {
@@ -158,6 +161,30 @@ public class PdfUtils {
             }
         }
         return bookmarkWithLevels1;
+    }
+
+
+    public static void genWaterMark(String inputFile, String outputFile,String imageFile) {
+        try {
+            PdfReader reader = new PdfReader(inputFile);
+            PdfStamper stamper = new PdfStamper(reader, new FileOutputStream(
+                    outputFile));
+            int total = reader.getNumberOfPages() + 1;
+            URL resource = PdfUtils.class.getClassLoader().getResource(imageFile);
+            Image image = Image.getInstance(resource.getPath());
+            image.scaleToFit(80,80);
+            // 图片位置
+            image.setAbsolutePosition(reader.getPageSize(1).getWidth()- 100,0);
+            PdfContentByte under;
+            for (int i = 1; i < total; i++) {
+                under = stamper.getUnderContent(i);
+                // 添加水印图片
+                under.addImage(image);
+            }
+            stamper.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 }
