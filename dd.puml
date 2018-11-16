@@ -1,12 +1,14 @@
 @startuml
 start
-if (开了测试名单?) then(是)
-:只发送测试地址给测试名单;
+if (这个text是大于body&&是新一行?) then(是)
+:保存上一行的大于body的内容;
+:清空sb;
+if(这个text是这行的第一个) then(是)
+:存这个text;
+endif
 else(没有)
-if(用户在测试名单中吗?)then(是)
-:发送测试地址;
-else(没有)
-:发送正式地址;
-
+:保存lastYBottom;
+:保存lastYTop;
+endif
 end
 @enduml

@@ -11,10 +11,9 @@ import javafx.application.Application;
 
 /**
  * @author zhangweixiao
- * 带有size的提取策略
+ *         带有size的提取策略
  */
 public class TextExtractionStategyWithSize implements TextExtractionStrategy {
-
 
     private Float lastyBottom = -1f;
 
@@ -22,13 +21,15 @@ public class TextExtractionStategyWithSize implements TextExtractionStrategy {
 
     private Float lastyTop = -1f;
 
-    private StringBuilder sb=new StringBuilder();
+    private StringBuilder sb = new StringBuilder();
+
+    private boolean startOfNewLine = false;
 
     /**
      * lastyBottom保存的是上一行文本书签，lastPlainBottom保存的是文本的bottom，
      * 用来判断是否换行，换行了就重置startOfLine，当找到第一个大字号字体的字时，如果并非一行的开头，就不加入。
      */
-    private Float lastPlainBottom = -1f;
+//    private Float lastPlainBottom = -1f;
 
 
     private StrategyWithFontSizeDto dto;
@@ -44,13 +45,11 @@ public class TextExtractionStategyWithSize implements TextExtractionStrategy {
     public String getResultantText() {
 
         boolean isBookmark = !sb.toString().equals("");
-        if(CommandLineHelper.arg.getMode()== 1){
-            isBookmark&=sb.toString().matches(RegexConsts.bookmarkStartRegex);
+        if (CommandLineHelper.arg.getMode() == 1) {
+            isBookmark &= sb.toString().matches(RegexConsts.bookmarkStartRegex);
         }
-        if(isBookmark )
-//        if(!sb.toString().equals(""))
-        {
-            dto.getBookmarkWithFontSizes().add(new BookmarkWithFontSize(sb.toString(), lastFontSize, lastyTop,dto.getPageNo()));
+        if (isBookmark) {
+            dto.getBookmarkWithFontSizes().add(new BookmarkWithFontSize(sb.toString(), lastFontSize, lastyTop, dto.getPageNo()));
         }
         return "";
     }
@@ -71,40 +70,24 @@ public class TextExtractionStategyWithSize implements TextExtractionStrategy {
         //这一行的顶线位置
         float yTop = renderInfo.getAscentLine().getEndPoint().get(Vector.I2);
         String text = renderInfo.getText();
-//        Float fontSize = (float) Math.round(yTop - yDesc);
         Float fontSize = yTop - yDesc;
-        //比正文字体大，作为书签
-//        System.out.println(renderInfo.getFont().getFontDescriptor(BaseFont.FONT_WEIGHT,1000));
-
-        if (!lastPlainBottom.equals(-1f) && !lastPlainBottom.equals(yBottom)) {
-            startMainBodySizeOfLine = 0;
+        //避免一行中非第一个的加大的关键字，这样的不做提取
+        if (fontSize.compareTo(dto.getMainBodySize()) <= 0) {
+            return;
         }
-
-        if (fontSize.compareTo(dto.getMainBodySize()) > 0) {
-
-            if (!lastyBottom.equals(-1f) && !lastyBottom.equals(yBottom)) {
-                if(!sb.toString().equals("") && sb.toString().matches(RegexConsts.bookmarkStartRegex))
-//                if(!sb.toString().equals(""))
-                {
-                    dto.getBookmarkWithFontSizes().add(new BookmarkWithFontSize(sb.toString(), lastFontSize, lastyTop,dto.getPageNo()));
-                }
-                sb=new StringBuilder();
+        if (!lastyBottom.equals(-1f) && !lastyBottom.equals(yBottom)) {
+            if (!sb.toString().equals("") && sb.toString().matches(RegexConsts.bookmarkStartRegex)) {
+                dto.getBookmarkWithFontSizes().add(new BookmarkWithFontSize(sb.toString(), lastFontSize, lastyTop, dto.getPageNo()));
             }
-
-            if (startMainBodySizeOfLine == 0) {
-                lastFontSize = fontSize;
-                lastyTop = yTop;
-                lastyBottom = yBottom;
-                sb.append(text);
-            }
-
+            sb = new StringBuilder();
+            sb.append(text);
+            startOfNewLine = false;
         } else {
-//            if (!lastPlainBottom.equals(-1f) && !lastPlainBottom.equals(yBottom)) {
-//                startMainBodySizeOfLine = 0;
-//            }
-            startMainBodySizeOfLine++;//这一行的第几个字，只有从第一个开始才算取章节
-            lastPlainBottom = yBottom;
+            startOfNewLine = true;
         }
+        lastFontSize = fontSize;
+        lastyTop = yTop;
+        lastyBottom = yBottom;
 
     }
 
