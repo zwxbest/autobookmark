@@ -1,8 +1,10 @@
 import com.itextpdf.text.pdf.PdfReader;
+import com.sun.org.apache.regexp.internal.RE;
 import command.CommandArg;
 import command.CommandLineHelper;
 import dto.BookmarkWithFontSize;
 import po.BookmarkWithLevel;
+import tools.Tools;
 import utils.Conveter;
 import utils.PdfUtils;
 
@@ -22,6 +24,16 @@ public class Starter {
         String temp=srcFile.getParent()+"\\"+srcFile.getName().replaceAll("\\.pdf","").concat("temp").concat(".pdf");
         String dest=srcFile.getParent()+"\\"+srcFile.getName().replaceAll("\\.pdf","").concat("-nizouba.com(你走吧)").concat(".pdf");
 
+        if(arg.getRegex()!=null){
+             dest=srcFile.getParent()+"\\"+srcFile.getName().replaceAll("\\.pdf","").concat("-nizouba.com(你走吧)-清理书签").concat(".pdf");
+            Tools.removeByRegex(arg.getFileName(),arg.getRegex(),dest);
+            return;
+        }
+        if(arg.getCopyFrom()!=null){
+            dest=srcFile.getParent()+"\\"+srcFile.getName().replaceAll("\\.pdf","").concat("-nizouba.com(你走吧)-复制书签").concat(".pdf");
+            Tools.copyBookmark(arg.getCopyFrom(),arg.getFileName(),dest);
+            return;
+        }
         PdfReader reader = new PdfReader(srcFile.getPath());
         List<BookmarkWithFontSize> bookmarkWithFontSize = PdfUtils.getBookmarkWithFontSize(reader);
 
@@ -34,6 +46,7 @@ public class Starter {
         if(tempFile.exists()){
             tempFile.delete();
         }
+        System.out.println("添加书签成功");
     }
 
 }

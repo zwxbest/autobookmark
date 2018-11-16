@@ -1,0 +1,12 @@
+@startuml
+start
+if (开了测试名单?) then(是)
+:只发送测试地址给测试名单;
+else(没有)
+if(用户在测试名单中吗?)then(是)
+:发送测试地址;
+else(没有)
+:发送正式地址;
+
+end
+@enduml

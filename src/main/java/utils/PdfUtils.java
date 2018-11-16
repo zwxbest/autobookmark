@@ -1,5 +1,7 @@
 package utils;
 
+import com.google.common.collect.Lists;
+import com.google.common.io.Resources;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.Image;
 import com.itextpdf.text.pdf.*;
@@ -125,27 +127,28 @@ public class PdfUtils {
 
     }
 
-    public static void converterBookmarks(List<HashMap<String, Object>> bookmarks,List<BookmarkWithLevel> bookmarkWithLevels,BookmarkWithLevel parent) throws Exception {
+    /**
+     * 生成书签之后进行过滤
+     * @param bookmarks x
+     * @param regex x
+     * @throws Exception x
+     */
+    public static void converterBookmarks(List<HashMap<String, Object>> bookmarks,String regex) throws Exception {
 
+        List<HashMap<String, Object>> bookmarkToRemove = Lists.newArrayList();
         for (HashMap<String, Object> bookmark : bookmarks) {
-            List<HashMap<String, Object>> kids= (List<HashMap<String, Object>>)bookmark.get("Kids");
-            String[] pageinfo=bookmark.get("Page").toString().split(" ");
-            BookmarkWithLevel level=new BookmarkWithLevel(bookmark.get("Title").toString(),parent,Float.valueOf(pageinfo[3]) ,null,Integer.valueOf(pageinfo[0]),new ArrayList<>());
-
-            if(parent!=null)
-            {
-                parent.getChilds().add(level);
-            }
-            bookmarkWithLevels.add(level);
-            if(kids==null){
-                 continue;
-            }
-            else {
-                converterBookmarks(kids,bookmarkWithLevels,level);
+            if(bookmark.get("Title").toString().matches(regex)){
+                bookmarkToRemove.add(bookmark);
             }
         }
+        bookmarks.removeAll(bookmarkToRemove);
     }
-
+    /**
+     * 生成书签的时候进行过滤
+     * @param bookmarkWithLevels x
+     * @param regex x
+     * @return x
+     */
     public static List<BookmarkWithLevel>  filterBookmarks(List<BookmarkWithLevel> bookmarkWithLevels,String regex)
     {
         List<BookmarkWithLevel> bookmarkWithLevels1=new ArrayList<>();
@@ -170,18 +173,22 @@ public class PdfUtils {
             PdfStamper stamper = new PdfStamper(reader, new FileOutputStream(
                     outputFile));
             int total = reader.getNumberOfPages() + 1;
-            URL resource = PdfUtils.class.getClassLoader().getResource(imageFile);
-            Image image = Image.getInstance(resource.getPath());
+            URL resource = Resources.getResource(imageFile);
+            Image image = Image.getInstance(resource);
             image.scaleToFit(80,80);
             // 图片位置
             image.setAbsolutePosition(reader.getPageSize(1).getWidth()- 100,0);
-            PdfContentByte under;
+            PdfContentByte over;
+            PdfGState gs1 = new PdfGState();
+            gs1.setFillOpacity(0.5f);
             for (int i = 1; i < total; i++) {
-                under = stamper.getUnderContent(i);
+                over = stamper.getOverContent(i);
                 // 添加水印图片
-                under.addImage(image);
+                over.setGState(gs1);
+                over.addImage(image);
             }
             stamper.close();
+            reader.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
