@@ -1,14 +1,23 @@
 @startuml
 start
-if (这个text是大于body&&是新一行?) then(是)
+while(遍历这一页?)
+if (是新一行?) then(是)
+if(大于body?) then (是)
+:firstOfThisLineIsBigger = true;
+else (不是)
+:firstOfThisLineIsBigger = false;
+endif
+endif
+if(firstOfThisLineIsBigger = false?) then (是)
+:continue;
+else (不是)
+if(是新一行 ) then (是)
 :保存上一行的大于body的内容;
 :清空sb;
-if(这个text是这行的第一个) then(是)
-:存这个text;
+else (不是)
+:追加这个text;
 endif
-else(没有)
-:保存lastYBottom;
-:保存lastYTop;
 endif
+endwhile
 end
 @enduml
