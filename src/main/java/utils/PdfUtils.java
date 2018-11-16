@@ -175,14 +175,18 @@ public class PdfUtils {
             int total = reader.getNumberOfPages() + 1;
             URL resource = Resources.getResource(imageFile);
             Image image = Image.getInstance(resource);
-            image.scaleToFit(80,80);
+
+            float imageWith = reader.getPageSize(1).getWidth()*0.12f;
+            image.scaleToFit(imageWith,imageWith);
             // 图片位置
-            image.setAbsolutePosition(reader.getPageSize(1).getWidth()- 100,0);
+
             PdfContentByte over;
             PdfGState gs1 = new PdfGState();
-            gs1.setFillOpacity(0.5f);
             for (int i = 1; i < total; i++) {
+                image.setAbsolutePosition(reader.getPageSize(i).getWidth()-image.getPlainWidth()*1.2f,0);
                 over = stamper.getOverContent(i);
+//                over.ellipse(1,1,200,200);
+//                over.fill();
                 // 添加水印图片
                 over.setGState(gs1);
                 over.addImage(image);
