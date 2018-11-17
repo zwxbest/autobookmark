@@ -5,6 +5,6 @@ package consts;
  */
 public class RegexConsts {
 
-    public static String bookmarkStartRegex="^(第|[0-9]+\\.).*";
+    public static String BOOKMARK_START_REGEX="^(第|[0-9]+).*";
 
 }

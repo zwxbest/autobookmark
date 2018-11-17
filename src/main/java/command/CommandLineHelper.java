@@ -49,7 +49,7 @@ public class CommandLineHelper {
         }
         String regex =cmd.getOptionValue("re");
         if(regex!=null){
-            arg.setRegex(regex);
+            arg.setCleanRegex(regex);
         }
         String copyFrom = cmd.getOptionValue("cp");
         if(copyFrom!=null){

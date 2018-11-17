@@ -1,9 +1,10 @@
+import com.google.common.collect.Maps;
 import com.itextpdf.text.pdf.PdfReader;
-import com.sun.org.apache.regexp.internal.RE;
 import command.CommandArg;
 import command.CommandLineHelper;
 import dto.BookmarkWithFontSize;
-import po.BookmarkWithLevel;
+import dto.BookmarkWithLevel;
+import java.util.Map;
 import tools.Tools;
 import utils.Conveter;
 import utils.PdfUtils;
@@ -19,14 +20,16 @@ public class Starter {
     public static CommandArg arg;
 
     public static void main(String[] args) throws Exception  {
+
+          args = new String[]{"-f","\"F:\\坚果云\\PDF\\大数据\\ELK stack权威指南.pdf\""};
         arg = CommandLineHelper.runCommand(args);
         File srcFile=new File(arg.getFileName());
         String temp=srcFile.getParent()+"\\"+srcFile.getName().replaceAll("\\.pdf","").concat("temp").concat(".pdf");
         String dest=srcFile.getParent()+"\\"+srcFile.getName().replaceAll("\\.pdf","").concat("-nizouba.com(你走吧)").concat(".pdf");
 
-        if(arg.getRegex()!=null){
+        if(arg.getCleanRegex()!=null){
              dest=srcFile.getParent()+"\\"+srcFile.getName().replaceAll("\\.pdf","").concat("-nizouba.com(你走吧)-清理书签").concat(".pdf");
-            Tools.removeByRegex(arg.getFileName(),arg.getRegex(),dest);
+            Tools.removeByRegex(arg.getFileName(),arg.getCleanRegex(),dest);
             return;
         }
         if(arg.getCopyFrom()!=null){

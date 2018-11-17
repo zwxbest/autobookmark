@@ -5,10 +5,8 @@ import com.itextpdf.text.pdf.PdfStamper;
 import com.itextpdf.text.pdf.SimpleBookmark;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import po.BookmarkWithLevel;
 import utils.PdfUtils;
 
 /**

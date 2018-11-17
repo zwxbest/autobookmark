@@ -1,0 +1,8 @@
+@startuml
+start
+while (前面的书签没有少一个层级?) then(是)
+:继续往前找;
+endwhile
+
+end
+@enduml

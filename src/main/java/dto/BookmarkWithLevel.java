@@ -1,5 +1,6 @@
-package po;
+package dto;
 
+import com.google.common.collect.Lists;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -34,6 +35,7 @@ public class BookmarkWithLevel {
 
     private int pageNum;
 
+    private List<String> numberInTitles = Lists.newArrayList();
 
     private List<BookmarkWithLevel> childs;
 }
