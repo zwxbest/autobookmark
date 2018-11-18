@@ -5,6 +5,7 @@ import com.google.common.collect.Maps;
 import command.CommandLineHelper;
 import dto.BookmarkWithFontSize;
 import dto.BookmarkWithLevel;
+import itext.LineTextPros;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,59 +15,62 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
- * Created by zwxbest on 2018/8/17.
+ * 转换成带层级的
+ * Created by zwxbest on 2018/11/18.
  */
-public class Conveter {
+public class BookmarkLevelConverter {
 
-    static Pattern p = Pattern.compile(CommandLineHelper.arg.getLevelRegex());
+    private static Pattern p = Pattern.compile(CommandLineHelper.arg.getLevelRegex());
 
-    public static List<BookmarkWithLevel> convertDtoToPo(
-        List<BookmarkWithFontSize> bookmarkWithFontSizeList) {
+    public static List<BookmarkWithLevel> convertFontSize2Leve(List<LineTextPros> lineTextProsList) {
         List<BookmarkWithLevel> bookmarkWithLevels = new ArrayList<>();
-        for (int i = 0; i < bookmarkWithFontSizeList.size(); i++) {
-            BookmarkWithFontSize bookmarkWithFontSize = bookmarkWithFontSizeList.get(i);
+
+        for (LineTextPros lineTextPros : lineTextProsList) {
             BookmarkWithLevel bookmarkWithLevel = new BookmarkWithLevel();
-            bookmarkWithLevel.setTitle(bookmarkWithFontSize.getBookmark());
-            bookmarkWithLevel.setYOffset(bookmarkWithFontSize.getYOffset());
-            bookmarkWithLevel.setFontSize(bookmarkWithFontSize.getFontSize());
-            bookmarkWithLevel.setPageNum(bookmarkWithFontSize.getPageNum());
-            String numberTitle = convertChsToDig(bookmarkWithFontSizeList.get(i).getBookmark());
+            bookmarkWithLevel.setTitle(lineTextPros.getLineText());
+            bookmarkWithLevel.setYOffset(lineTextPros.getYTop());
+            bookmarkWithLevel.setFontSize(lineTextPros.getMaxFontSize());
+            bookmarkWithLevel.setPageNum(lineTextPros.getPageNo());
+            String numberTitle = convertChsToDig(lineTextPros.getLineText());
             Matcher m = p.matcher(numberTitle);
             if (m.find()) {
                 String number = m.group(1);
                 bookmarkWithLevel.setNumberInTitles(Lists.newArrayList(number.split(CommandLineHelper.arg.getLeveRegexSep())));
             }
-            for (int j = bookmarkWithLevels.size() - 1; j >= 0; j--) {
-                //按照书签层级找
-                boolean findParent = findParent(bookmarkWithLevel,bookmarkWithLevels.get(j));
-                if (findParent) {
-                    bookmarkWithLevel.setParent(bookmarkWithLevels.get(j));
-                    break;
+
+            if (!bookmarkWithLevel.getNumberInTitles().isEmpty()) {
+                for (int j = bookmarkWithLevels.size() - 1; j >= 0; j--) {
+                    //按照书签层级找
+                    boolean findParent = findParent(bookmarkWithLevel, bookmarkWithLevels.get(j));
+                    if (findParent) {
+                        bookmarkWithLevel.setParent(bookmarkWithLevels.get(j));
+                        break;
+                    }
                 }
             }
+
             bookmarkWithLevels.add(bookmarkWithLevel);
         }
         return bookmarkWithLevels;
     }
-    private static boolean findParent(BookmarkWithLevel bookmarkWithLevel,BookmarkWithLevel bookmarkWithLeve2){
+
+    private static boolean findParent(BookmarkWithLevel bookmarkWithLevel, BookmarkWithLevel bookmarkWithLeve2) {
         List<String> numberInTitles = bookmarkWithLevel.getNumberInTitles();
         List<String> numberInTitles1 = bookmarkWithLeve2.getNumberInTitles();
-        int size = numberInTitles.size();
-        int size1 = numberInTitles1.size();
-        if(size <= size1){
+        if(numberInTitles1.isEmpty()){
             return false;
         }
-        int minSize = size<size1?size:size1;
-        for(int i=0;i<minSize;i++){
-            if(!numberInTitles.get(i).equals(numberInTitles1.get(i))){
+        int size = numberInTitles.size();
+        int size1 = numberInTitles1.size();
+        if (size <= size1) {
+            return false;
+        }
+        for (int i = 0; i < size1; i++) {
+            if (!numberInTitles.get(i).equals(numberInTitles1.get(i))) {
                 return false;
             }
         }
         return true;
-    }
-
-    public static void main(String[] args) {
-        System.out.println(convertChsToDig("第九章"));
     }
 
     private static String convertChsToDig(String chs) {
@@ -123,6 +127,4 @@ public class Conveter {
         }
         return chs;
     }
-
-
 }

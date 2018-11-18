@@ -71,22 +71,21 @@ public class BookmarkExtractionStrategy implements TextExtractionStrategy {
         String text = renderInfo.getText();
 
         float fontSize = PdfUtils.getFontSize(renderInfo);
-        if(dto.getPageNo()==183){
-            System.out.println(fontSize+" "+text+" "+lastYBottom+"");
-        }
+//        if(dto.getPageNo()==28){
+//            System.out.println(fontSize+" "+text+" "+lastYBottom+"");
+//        }
         //是否是新的一行
         if (lastYBottom != yBottom) {
             isNewLine = true;
             //这行的第一个是不是书签？
             firstIsBookMark =
-                fontSize > dto.getBodySize() && (!"".equals(text.trim()) && text
-                    .matches(RegexConsts.BOOKMARK_START_REGEX));
+                fontSize > dto.getBodySize() && (!"".equals(text.trim()));
         } else {
             isNewLine = false;
         }
         if (firstIsBookMark) {
             if (isNewLine) {
-                if (!"".equals(sb.toString())) {
+                if (!"".equals(sb.toString())&& sb.toString().matches(RegexConsts.BOOKMARK_START_REGEX)) {
                     dto.getBookmarkWithFontSizes().add(
                         new BookmarkWithFontSize(sb.toString(), maxFontSize, lastYTop,
                             dto.getPageNo()));
@@ -95,14 +94,14 @@ public class BookmarkExtractionStrategy implements TextExtractionStrategy {
                 maxFontSize = -1f;
             }
             sb.append(text);
-            lastFontSize = fontSize;
-            lastYTop = yTop;
-
             if (fontSize > maxFontSize) {
                 maxFontSize = fontSize;
             }
+            lastYTop = yTop;
+            lastFontSize = fontSize;
+            lastYBottom = yBottom;
         }
-        lastYBottom = yBottom;
+
     }
 
     @Override

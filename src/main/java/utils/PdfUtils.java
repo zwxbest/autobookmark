@@ -1,6 +1,7 @@
 package utils;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.io.Resources;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.Image;
@@ -9,14 +10,20 @@ import com.itextpdf.text.pdf.parser.PdfTextExtractor;
 import com.itextpdf.text.pdf.parser.TextRenderInfo;
 import com.itextpdf.text.pdf.parser.Vector;
 import command.CommandLineHelper;
+import consts.RegexConsts;
+import core.BookmarkFilterHandler;
+import dto.BookmarkPage;
 import dto.BookmarkWithFontSize;
 import dto.BookmarkWithLevel;
 import dto.StrategyWithFontSizeDto;
+import itext.LineTextExtractionStrategy;
+import itext.LineTextPros;
 import strategy.BookmarkExtractionStrategy;
 
 import java.io.FileOutputStream;
 import java.net.URL;
 import java.util.*;
+
 import strategy.TextExtractionStrategyFindBodySize;
 
 /**
@@ -27,8 +34,8 @@ public class PdfUtils {
     /**
      * 获取书签的List，包含FontSize,后续用来分层
      */
-    public static List<BookmarkWithFontSize> getBookmarkWithFontSize(PdfReader reader)
-        throws Exception {
+    public static List<BookmarkWithLevel> getBookmarkWithLevel(PdfReader reader)
+            throws Exception {
         float bodySize;
         if (CommandLineHelper.arg.getSize() == null) {
             bodySize = getBodyFontSize(reader);
@@ -38,16 +45,27 @@ public class PdfUtils {
         //总页数
         int numberOfPages = reader.getNumberOfPages();
         StrategyWithFontSizeDto dto = new StrategyWithFontSizeDto();
+        List<LineTextPros> filteredLineTextPros = Lists.newArrayList();
         for (int i = 1; i <= numberOfPages; i++) {
+            System.out.println(i);
             dto.setBodySize(bodySize);
             dto.setPageHeight(reader.getPageSize(i).getHeight());
             dto.setPageNo(i);
-
-            BookmarkExtractionStrategy bookmarkExtractionStrategy = new BookmarkExtractionStrategy(
-                dto);
+            //存储每页中的所有行
+            List<LineTextPros> lineTextProsList = Lists.newArrayList();
+            LineTextExtractionStrategy bookmarkExtractionStrategy = new LineTextExtractionStrategy(lineTextProsList, i);
             PdfTextExtractor.getTextFromPage(reader, i, bookmarkExtractionStrategy);
+            //处理书签业务逻辑
+            BookmarkFilterHandler handler = new BookmarkFilterHandler(lineTextProsList);
+            filteredLineTextPros.addAll(handler.filter(lineTextPros -> {
+                boolean b = lineTextPros.getMaxFontSize() > bodySize;
+                if (CommandLineHelper.arg.getLevelRegex() != null) {
+                    b &= lineTextPros.getLineText().matches(RegexConsts.BOOKMARK_START_REGEX);
+                }
+                return b;
+            }));
         }
-            return dto.getBookmarkWithFontSizes();
+        return BookmarkLevelConverter.convertFontSize2Leve(filteredLineTextPros);
     }
 
     /**
@@ -60,7 +78,7 @@ public class PdfUtils {
         Map<Float, Integer> fontSizeCountMap = new TreeMap<>((a, b) -> -a.compareTo(b));
         //获取文字大小的策略
         TextExtractionStrategyFindBodySize strategyWithSize = new TextExtractionStrategyFindBodySize(
-            fontSizeCountMap);
+                fontSizeCountMap);
         //取5张作为样本
         for (int i = 0; i < 5; i++) {
             //跳过第一页
@@ -81,7 +99,7 @@ public class PdfUtils {
     }
 
     public static void createBookmarks(List<BookmarkWithLevel> booksmarks, PdfReader reader,
-        String dest) throws Exception {
+                                       String dest) throws Exception {
         Document document = new Document();
         PdfCopy copy = new PdfCopy(document, new FileOutputStream(dest));
         document.open();
@@ -98,7 +116,7 @@ public class PdfUtils {
         for (BookmarkWithLevel bookMark : booksmarks) {
             //*1.1f是想上面露一点，要不太贴着文字了。
             action = PdfAction.gotoLocalPage(bookMark.getPageNum(), new PdfDestination(
-                PdfDestination.XYZ, -1, bookMark.getYOffset() * 1.05f, 0), copy);
+                    PdfDestination.XYZ, -1, bookMark.getYOffset() * 1.05f, 0), copy);
             if (bookMark.getParent() != null) {
                 parent = maps.get(bookMark.getParent());
             } else {
@@ -118,11 +136,11 @@ public class PdfUtils {
      * 生成书签之后进行过滤
      *
      * @param bookmarks x
-     * @param regex x
+     * @param regex     x
      * @throws Exception x
      */
     public static void converterBookmarks(List<HashMap<String, Object>> bookmarks, String regex)
-        throws Exception {
+            throws Exception {
 
         List<HashMap<String, Object>> bookmarkToRemove = Lists.newArrayList();
         for (HashMap<String, Object> bookmark : bookmarks) {
@@ -137,7 +155,7 @@ public class PdfUtils {
         try {
             PdfReader reader = new PdfReader(inputFile);
             PdfStamper stamper = new PdfStamper(reader, new FileOutputStream(
-                outputFile));
+                    outputFile));
             int total = reader.getNumberOfPages() + 1;
             URL resource = Resources.getResource(imageFile);
             Image image = Image.getInstance(resource);
@@ -150,7 +168,7 @@ public class PdfUtils {
             PdfGState gs1 = new PdfGState();
             for (int i = 1; i < total; i++) {
                 image.setAbsolutePosition(
-                    reader.getPageSize(i).getWidth() - image.getPlainWidth() * 1.2f, 0);
+                        reader.getPageSize(i).getWidth() - image.getPlainWidth() * 1.2f, 0);
                 over = stamper.getOverContent(i);
                 over.setGState(gs1);
                 over.addImage(image);

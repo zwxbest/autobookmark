@@ -20,8 +20,7 @@ public class Starter {
     public static CommandArg arg;
 
     public static void main(String[] args) throws Exception  {
-
-          args = new String[]{"-f","\"F:\\坚果云\\PDF\\大数据\\ELK stack权威指南.pdf\""};
+        args = new String[]{"-f","\"E:\\PDF\\大数据\\Greenplum企业应用实战.pdf\""};
         arg = CommandLineHelper.runCommand(args);
         File srcFile=new File(arg.getFileName());
         String temp=srcFile.getParent()+"\\"+srcFile.getName().replaceAll("\\.pdf","").concat("temp").concat(".pdf");
@@ -38,10 +37,7 @@ public class Starter {
             return;
         }
         PdfReader reader = new PdfReader(srcFile.getPath());
-        List<BookmarkWithFontSize> bookmarkWithFontSize = PdfUtils.getBookmarkWithFontSize(reader);
-
-        List<BookmarkWithLevel> bookmarkWithLevels = Conveter.convertDtoToPo(bookmarkWithFontSize);
-
+        List<BookmarkWithLevel> bookmarkWithLevels = PdfUtils.getBookmarkWithLevel(reader);
         //写入书签
         PdfUtils.createBookmarks(bookmarkWithLevels,reader,temp);
         PdfUtils.genWaterMark(temp,dest,"nizouba.png");
