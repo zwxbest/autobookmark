@@ -15,7 +15,6 @@ import java.util.regex.Pattern;
  */
 public class FontSizeConverter implements LevelConverter {
 
-    private static Pattern p = Pattern.compile(Config.levelMode.getLevelRegex());
 
     @Override
     public List<BookmarkWithLevel> convertFontSize2Leve(List<LineTextPros> lineTextProsList) {
@@ -23,11 +22,6 @@ public class FontSizeConverter implements LevelConverter {
         for (LineTextPros lineTextPros : lineTextProsList) {
             BookmarkWithLevel bookmarkWithLevel = LevelConverterUtil
                 .convertFontSize2Level(lineTextPros);
-            Matcher m = p.matcher(bookmarkWithLevel.getTitle());
-            if (m.find()) {
-                String number = m.group(1);
-                bookmarkWithLevel.setNumberInTitles(Lists.newArrayList(number.split("\\.")));
-            }
             bookmarkWithLevels.add(bookmarkWithLevel);
             for (int j = bookmarkWithLevels.size() - 1; j >= 0; j--) {
                 //按照书签层级找
