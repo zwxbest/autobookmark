@@ -46,7 +46,7 @@ public class LineTextExtractionStrategy implements TextExtractionStrategy {
             return;
         }
         lineTextPros.setMaxFontSize(maxFontSize);
-        lineTextPros.setLineText(lineText.toString());
+        lineTextPros.setLineText(lineText.toString().trim());
         lineTextPros.setFirstBlockFontSize(firstBlockFontSize);
         lineTextPros.setYBottom(lastYBottom);
         lineTextPros.setYTop(lastYTop);

@@ -1,5 +1,6 @@
 package com.nizouba.controller;
 
+import com.nizouba.Starter;
 import com.nizouba.consts.RegexConsts;
 import com.nizouba.core.ExtractRule;
 import com.nizouba.core.LevelMode;
@@ -8,6 +9,8 @@ import com.nizouba.core.config.Config;
 import java.io.File;
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -112,6 +115,24 @@ public class HandlerDialogController implements Initializable {
         Node source = (Node) event.getSource();
         Stage stage = (Stage) source.getScene().getWindow();
         stage.close();
+        startHandle();
+    }
+
+    private void startHandle(){
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        executorService.submit(()->{
+            try {
+                String[] args = new String[]{"-f", Config.pdfFile.getPath()};
+                Starter.main(args);
+            }catch (Exception e){
+                Alert alert = new Alert(AlertType.ERROR);
+                alert.setTitle("出错了");
+                alert.setHeaderText(null);
+                alert.setContentText(e.getMessage());
+                alert.showAndWait();
+            }
+        });
+
     }
 
     private void alertBodyFont() {

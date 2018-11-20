@@ -8,48 +8,44 @@ import com.itextpdf.text.pdf.*;
 import com.itextpdf.text.pdf.parser.PdfTextExtractor;
 import com.itextpdf.text.pdf.parser.TextRenderInfo;
 import com.itextpdf.text.pdf.parser.Vector;
-import com.nizouba.command.CommandLineHelper;
 import com.nizouba.consts.RegexConsts;
+import com.nizouba.controller.MainController;
 import com.nizouba.core.BookmarkFilterHandler;
-import com.nizouba.dto.BookmarkPage;
-import com.nizouba.dto.BookmarkWithFontSize;
+import com.nizouba.core.LevelMode.LevelModeEnum;
+import com.nizouba.core.config.Config;
 import com.nizouba.dto.BookmarkWithLevel;
-import com.nizouba.dto.StrategyWithFontSizeDto;
 import com.nizouba.itext.LineTextExtractionStrategy;
 import com.nizouba.itext.LineTextPros;
-import com.nizouba.strategy.BookmarkExtractionStrategy;
 
+import com.nizouba.level.FontSizeConverter;
+import com.nizouba.level.LevelConverter;
+import com.nizouba.level.RegexFontLevelConverter;
 import java.io.FileOutputStream;
 import java.net.URL;
 import java.util.*;
 
 import com.nizouba.strategy.TextExtractionStrategyFindBodySize;
+import javafx.application.Platform;
 
 /**
  * @author zhangweixiao
  */
 public class PdfUtils {
-
     /**
      * 获取书签的List，包含FontSize,后续用来分层
      */
     public static List<BookmarkWithLevel> getBookmarkWithLevel(PdfReader reader)
             throws Exception {
         float bodySize;
-        if (CommandLineHelper.arg.getSize() == null) {
+        if (Config.bodySize == null) {
             bodySize = getBodyFontSize(reader);
         } else {
-            bodySize = CommandLineHelper.arg.getSize();
+            bodySize = Config.bodySize;
         }
         //总页数
         int numberOfPages = reader.getNumberOfPages();
-        StrategyWithFontSizeDto dto = new StrategyWithFontSizeDto();
         List<LineTextPros> filteredLineTextPros = Lists.newArrayList();
         for (int i = 1; i <= numberOfPages; i++) {
-            System.out.println(i);
-            dto.setBodySize(bodySize);
-            dto.setPageHeight(reader.getPageSize(i).getHeight());
-            dto.setPageNo(i);
             //存储每页中的所有行
             List<LineTextPros> lineTextProsList = Lists.newArrayList();
             LineTextExtractionStrategy bookmarkExtractionStrategy = new LineTextExtractionStrategy(lineTextProsList, i);
@@ -58,13 +54,25 @@ public class PdfUtils {
             BookmarkFilterHandler handler = new BookmarkFilterHandler(lineTextProsList);
             filteredLineTextPros.addAll(handler.filter(lineTextPros -> {
                 boolean b = lineTextPros.getMaxFontSize() > bodySize;
-                if (CommandLineHelper.arg.getLevelRegex() != null) {
+                if (Config.extractRule.addMarkRegex) {
                     b &= lineTextPros.getLineText().matches(RegexConsts.BOOKMARK_START_REGEX);
                 }
                 return b;
             }));
+            //todo：调用progressBar发送进度
+            float progress = Math.round(i/(float)(numberOfPages)*100)/100f-0.01f;
+            System.out.println(Math.round(i/(float)(numberOfPages)*100)/100f-0.01f);
+            Platform.runLater(()->MainController.progressValue.set(progress));
         }
-        return BookmarkLevelConverter.convertFontSize2Leve(filteredLineTextPros);
+        LevelConverter levelConverter ;
+        if(Config.levelMode.getLevelModeEnum().equals(LevelModeEnum.FontSizeMode)){
+            levelConverter = new FontSizeConverter();
+        }else if(Config.levelMode.getLevelModeEnum().equals(LevelModeEnum.ChapterMode)){
+            levelConverter = new RegexFontLevelConverter();
+        }else {
+            levelConverter = new RegexFontLevelConverter();
+        }
+        return levelConverter.convertFontSize2Leve(filteredLineTextPros);
     }
 
     /**

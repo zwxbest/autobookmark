@@ -1,41 +1,25 @@
 package com.nizouba;
 
 import com.itextpdf.text.pdf.PdfReader;
-import com.nizouba.command.CommandArg;
-import com.nizouba.command.CommandLineHelper;
-import com.nizouba.config.LastConfig;
-import com.nizouba.dto.BookmarkWithFontSize;
+import com.nizouba.controller.MainController;
+import com.nizouba.core.config.Config;
 import com.nizouba.dto.BookmarkWithLevel;
-import com.nizouba.tools.Tools;
-import com.nizouba.utils.Conveter;
 import com.nizouba.utils.PdfUtils;
 
 import java.io.File;
 import java.util.List;
+import javafx.application.Platform;
+
 /**
  * @author zhangweixiao
  */
 public class Starter {
 
-    public static CommandArg arg;
-
     public static void main(String[] args) throws Exception  {
-        args = new String[]{"-f","\"E:\\PDF\\大数据\\Greenplum企业应用实战.pdf\""};
-        arg = CommandLineHelper.runCommand(args);
-        File srcFile=new File(arg.getFileName());
+        File srcFile= Config.pdfFile;
         String temp=srcFile.getParent()+"\\"+srcFile.getName().replaceAll("\\.pdf","").concat("temp").concat(".pdf");
         String dest=srcFile.getParent()+"\\"+srcFile.getName().replaceAll("\\.pdf","").concat("-nizouba.com(你走吧)").concat(".pdf");
 
-        if(arg.getCleanRegex()!=null){
-             dest=srcFile.getParent()+"\\"+srcFile.getName().replaceAll("\\.pdf","").concat("-nizouba.com(你走吧)-清理书签").concat(".pdf");
-            Tools.removeByRegex(arg.getFileName(),arg.getCleanRegex(),dest);
-            return;
-        }
-        if(arg.getCopyFrom()!=null){
-            dest=srcFile.getParent()+"\\"+srcFile.getName().replaceAll("\\.pdf","").concat("-nizouba.com(你走吧)-复制书签").concat(".pdf");
-            Tools.copyBookmark(arg.getCopyFrom(),arg.getFileName(),dest);
-            return;
-        }
         PdfReader reader = new PdfReader(srcFile.getPath());
         List<BookmarkWithLevel> bookmarkWithLevels = PdfUtils.getBookmarkWithLevel(reader);
         //写入书签
@@ -46,6 +30,8 @@ public class Starter {
             tempFile.delete();
         }
         System.out.println("添加书签成功");
+        //完成
+        Platform.runLater(()-> MainController.progressValue.set(1f));
     }
 
 }

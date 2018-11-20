@@ -1,38 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Menu?>
-<?import javafx.scene.control.MenuItem?>
-<?import javafx.scene.control.SeparatorMenuItem?>
 <?import javafx.scene.control.MenuBar?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.ProgressBar?>
-<VBox id="vbox" prefHeight="400" prefWidth="800"
-  xmlns:fx="http://javafx.com/fxml" fx:controller="com.nizouba.controller.MainController">
+<?import javafx.scene.control.SeparatorMenuItem?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<?import javafx.scene.control.ProgressIndicator?>
+<?import javafx.scene.control.TextField?>
+<VBox id="vbox" prefHeight="400" prefWidth="800" styleClass="bg" stylesheets="@css/mainPannel.css"
+  xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8.0.121"
+  fx:controller="com.nizouba.controller.MainController">
   <MenuBar fx:id="menuBar">
     <menus>
       <Menu text="文件">
         <items>
-          <MenuItem text="打开" onAction="#handleOpenAction"/>
-          <MenuItem text="Save PDF"/>
-          <MenuItem text="Save As"/>
-          <SeparatorMenuItem  />
-          <MenuItem text="Exit"/>
-        </items>
+          <MenuItem onAction="#handleOpenAction" text="打开"/>
+          </items>
       </Menu>
-      <Menu text="Edit">
+          <Menu text="帮助">
         <items>
-          <MenuItem text="Copy"/>
-          <MenuItem text="Cut"/>
-          <MenuItem text="Paste"/>
-        </items>
-      </Menu>
-      <Menu text="帮助">
-        <items>
-          <MenuItem text="在线手册" onAction="#handleOnlineManualAction"/>
-          <MenuItem text="关于" onAction="#handleAboutAction"/>
+          <MenuItem onAction="#handleOnlineManualAction" text="在线手册"/>
+          <MenuItem onAction="#handleAboutAction" text="关于"/>
         </items>
       </Menu>
     </menus>
   </MenuBar>
-  <ProgressBar translateY="290" translateX="350" minWidth="100" minHeight="20" scaleY="2" scaleX="2">
+  <HBox fx:id="progressBox" alignment="CENTER" translateY="250" visible="false">
+    <Label text="进度："/>
+    <ProgressBar fx:id="progressBar" scaleX="2" scaleY="2"  />
+    <VBox translateX="100">
+      <ProgressIndicator fx:id="indicator" scaleX="2"  scaleY="2" />
+    </VBox>
 
-  </ProgressBar>
+  </HBox>
 </VBox>
