@@ -19,6 +19,7 @@ import com.nizouba.itext.LineTextPros;
 
 import com.nizouba.level.FontSizeConverter;
 import com.nizouba.level.LevelConverter;
+import com.nizouba.level.LevelRegexConveter;
 import com.nizouba.level.RegexFontLevelConverter;
 import java.io.FileOutputStream;
 import java.net.URL;
@@ -68,7 +69,7 @@ public class PdfUtils {
         if(Config.levelMode.getLevelModeEnum().equals(LevelModeEnum.FontSizeMode)){
             levelConverter = new FontSizeConverter();
         }else if(Config.levelMode.getLevelModeEnum().equals(LevelModeEnum.ChapterMode)){
-            levelConverter = new RegexFontLevelConverter();
+            levelConverter = new LevelRegexConveter();
         }else {
             levelConverter = new RegexFontLevelConverter();
         }
@@ -167,7 +168,7 @@ public class PdfUtils {
             URL resource = Resources.getResource(imageFile);
             Image image = Image.getInstance(resource);
 
-            float imageWith = reader.getPageSize(1).getWidth() * 0.12f;
+            float imageWith = reader.getPageSize(2).getWidth() * 0.12f;
             image.scaleToFit(imageWith, imageWith);
             // 图片位置
 
@@ -175,7 +176,7 @@ public class PdfUtils {
             PdfGState gs1 = new PdfGState();
             for (int i = 1; i < total; i++) {
                 image.setAbsolutePosition(
-                        reader.getPageSize(i).getWidth() - image.getPlainWidth() * 1.2f, 0);
+                        reader.getPageSize(i).getWidth() - image.getPlainWidth() * 1.2f, 0+image.getPlainHeight()*0.1f);
                 over = stamper.getOverContent(i);
                 over.setGState(gs1);
                 over.addImage(image);

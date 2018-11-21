@@ -1,15 +1,21 @@
 package com.nizouba.level;
 
+import com.google.common.collect.Lists;
+import com.nizouba.core.config.Config;
 import com.nizouba.dto.BookmarkWithLevel;
 import com.nizouba.itext.LineTextPros;
 import com.nizouba.utils.LevelConverterUtil;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author zhangweixiao
  */
 public class LevelRegexConveter  implements LevelConverter{
+
+    private Pattern p = Pattern.compile(Config.levelMode.getLevelRegex());
 
     @Override
     public List<BookmarkWithLevel> convertFontSize2Leve(List<LineTextPros> lineTextProsList) {
@@ -19,6 +25,11 @@ public class LevelRegexConveter  implements LevelConverter{
                 .convertFontSize2Level(lineTextPros);
             bookmarkWithLevels.add(bookmarkWithLevel);
 
+            Matcher m = p.matcher(bookmarkWithLevel.getTitle());
+            if (m.find()) {
+                String number = m.group(1);
+                bookmarkWithLevel.setNumberInTitles(Lists.newArrayList(number.split("\\.")));
+            }
             for (int j = bookmarkWithLevels.size() - 1; j >= 0; j--) {
                 //按照书签层级找
                 boolean findParent = findParentByRegex(bookmarkWithLevel,
