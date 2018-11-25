@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
  */
 public class LevelRegexConveter  implements LevelConverter{
 
-    private Pattern p = Pattern.compile(Config.levelMode.getLevelRegex());
+    private Pattern p = Pattern.compile(Config.configProperties.getLevelMode().getLevelRegex());
 
     @Override
     public List<BookmarkWithLevel> convertFontSize2Leve(List<LineTextPros> lineTextProsList) {
@@ -23,8 +23,6 @@ public class LevelRegexConveter  implements LevelConverter{
         for (LineTextPros lineTextPros : lineTextProsList) {
             BookmarkWithLevel bookmarkWithLevel = LevelConverterUtil
                 .convertFontSize2Level(lineTextPros);
-            bookmarkWithLevels.add(bookmarkWithLevel);
-
             Matcher m = p.matcher(bookmarkWithLevel.getTitle());
             if (m.find()) {
                 String number = m.group(1);
@@ -39,6 +37,7 @@ public class LevelRegexConveter  implements LevelConverter{
                     break;
                 }
             }
+            bookmarkWithLevels.add(bookmarkWithLevel);
         }
         return bookmarkWithLevels;
     }
@@ -55,7 +54,7 @@ public class LevelRegexConveter  implements LevelConverter{
         BookmarkWithLevel maybeParent) {
         List<String> childNumberInTitles = child.getNumberInTitles();
         List<String> maybeParentNumberInTitles = maybeParent.getNumberInTitles();
-        if (childNumberInTitles.isEmpty()) {
+        if (childNumberInTitles.isEmpty()||maybeParentNumberInTitles.isEmpty()) {
             return false;
         }
         int childSize = childNumberInTitles.size();

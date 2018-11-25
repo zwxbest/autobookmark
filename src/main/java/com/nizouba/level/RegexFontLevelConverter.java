@@ -18,7 +18,8 @@ import java.util.regex.Pattern;
  */
 public class RegexFontLevelConverter implements LevelConverter {
 
-    private Pattern p = Pattern.compile(Config.levelMode.getLevelRegex());
+    private Pattern p = Pattern.compile(Config.configProperties.getLevelMode().getLevelRegex());
+
     @Override
     public List<BookmarkWithLevel> convertFontSize2Leve(List<LineTextPros> lineTextProsList) {
         List<BookmarkWithLevel> bookmarkWithLevels = new ArrayList<>();
@@ -30,30 +31,30 @@ public class RegexFontLevelConverter implements LevelConverter {
                 String number = m.group(1);
                 bookmarkWithLevel.setNumberInTitles(Lists.newArrayList(number.split("\\.")));
             }
-            bookmarkWithLevels.add(bookmarkWithLevel);
 
+            boolean findParent = false;
             for (int j = bookmarkWithLevels.size() - 1; j >= 0; j--) {
-                //按照书签层级找
-                boolean findParent = findParentByRegexAndFontSize(bookmarkWithLevel,
+                //先按照书签层级找
+                findParent = findParentByRegex(bookmarkWithLevel,
                     bookmarkWithLevels.get(j));
                 if (findParent) {
                     bookmarkWithLevel.setParent(bookmarkWithLevels.get(j));
                     break;
                 }
             }
+            if (!findParent) {
+                for (int j = bookmarkWithLevels.size() - 1; j >= 0; j--) {
+                    //先按照书签层级找
+                    findParent = findParentByFontSize(bookmarkWithLevel,
+                        bookmarkWithLevels.get(j));
+                    if (findParent) {
+                        bookmarkWithLevel.setParent(bookmarkWithLevels.get(j));
+                        break;
+                    }
+                }
+            }
+            bookmarkWithLevels.add(bookmarkWithLevel);
         }
         return bookmarkWithLevels;
-    }
-
-    /**
-     * 混合模式，当child解析的正则为空或者按照正则没找到时，就按照字体找爹妈
-     */
-    private static boolean findParentByRegexAndFontSize(BookmarkWithLevel child,
-        BookmarkWithLevel maybeParent) {
-        if (child.getNumberInTitles().isEmpty()) {
-            return findParentByFontSize(child, maybeParent);
-        } else {
-            return findParentByRegex(child, maybeParent) | findParentByFontSize(child, maybeParent);
-        }
     }
 }

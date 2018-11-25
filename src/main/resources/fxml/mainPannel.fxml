@@ -11,6 +11,7 @@
 
 <?import javafx.scene.control.ProgressIndicator?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Button?>
 <VBox id="vbox" prefHeight="400" prefWidth="800" styleClass="bg" stylesheets="@css/mainPannel.css"
   xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8.0.121"
   fx:controller="com.nizouba.controller.MainController">
@@ -35,6 +36,7 @@
     <VBox translateX="100">
       <ProgressIndicator fx:id="indicator" scaleX="2"  scaleY="2" />
     </VBox>
-
+    <Button fx:id="openFolderButton" translateY="100"   text="打开生成目录" onAction="#openClick"/>
+    <Button fx:id="openFileButton" translateY="100" translateX="50" text="打开生成文件" onAction="#openClick"/>
   </HBox>
 </VBox>

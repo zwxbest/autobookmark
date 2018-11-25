@@ -1,6 +1,7 @@
 package com.nizouba.utils;
 
 import com.google.common.collect.Lists;
+import com.google.common.eventbus.EventBus;
 import com.google.common.io.Resources;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.Image;
@@ -10,6 +11,8 @@ import com.itextpdf.text.pdf.parser.TextRenderInfo;
 import com.itextpdf.text.pdf.parser.Vector;
 import com.nizouba.consts.RegexConsts;
 import com.nizouba.controller.MainController;
+import com.nizouba.core.BodySizeMode;
+import com.nizouba.core.BodySizeMode.BodySizeEnum;
 import com.nizouba.core.BookmarkFilterHandler;
 import com.nizouba.core.LevelMode.LevelModeEnum;
 import com.nizouba.core.config.Config;
@@ -32,16 +35,17 @@ import javafx.application.Platform;
  * @author zhangweixiao
  */
 public class PdfUtils {
+
     /**
      * 获取书签的List，包含FontSize,后续用来分层
      */
     public static List<BookmarkWithLevel> getBookmarkWithLevel(PdfReader reader)
-            throws Exception {
+        throws Exception {
         float bodySize;
-        if (Config.bodySize == null) {
+        if (!Config.configProperties.getBodySizeMode().getBodySizeEnum().equals(BodySizeEnum.CUSTOM)) {
             bodySize = getBodyFontSize(reader);
         } else {
-            bodySize = Config.bodySize;
+            bodySize = Config.configProperties.getBodySizeMode().getBodySize();
         }
         //总页数
         int numberOfPages = reader.getNumberOfPages();
@@ -49,28 +53,33 @@ public class PdfUtils {
         for (int i = 1; i <= numberOfPages; i++) {
             //存储每页中的所有行
             List<LineTextPros> lineTextProsList = Lists.newArrayList();
-            LineTextExtractionStrategy bookmarkExtractionStrategy = new LineTextExtractionStrategy(lineTextProsList, i);
+            LineTextExtractionStrategy bookmarkExtractionStrategy = new LineTextExtractionStrategy(
+                lineTextProsList, i);
             PdfTextExtractor.getTextFromPage(reader, i, bookmarkExtractionStrategy);
             //处理书签业务逻辑
             BookmarkFilterHandler handler = new BookmarkFilterHandler(lineTextProsList);
             filteredLineTextPros.addAll(handler.filter(lineTextPros -> {
-                boolean b = lineTextPros.getMaxFontSize() > bodySize;
-                if (Config.extractRule.addMarkRegex) {
+
+                //是根据首字号还是最大字号
+                boolean b =
+                    Config.configProperties.getCompareSelect() == 0 ? lineTextPros.getFirstBlockFontSize() > bodySize
+                        : lineTextPros.getMaxFontSize() > bodySize;
+                if (Config.configProperties.getExtractRule().addMarkRegex) {
                     b &= lineTextPros.getLineText().matches(RegexConsts.BOOKMARK_START_REGEX);
                 }
                 return b;
             }));
             //todo：调用progressBar发送进度
-            float progress = Math.round(i/(float)(numberOfPages)*100)/100f-0.01f;
-            System.out.println(Math.round(i/(float)(numberOfPages)*100)/100f-0.01f);
-            Platform.runLater(()->MainController.progressValue.set(progress));
+            float progress = Math.round(i / (float) (numberOfPages) * 100) / 100f - 0.01f;
+            System.out.println(Math.round(i / (float) (numberOfPages) * 100) / 100f - 0.01f);
+            Platform.runLater(() -> MainController.progressValue.set(progress));
         }
-        LevelConverter levelConverter ;
-        if(Config.levelMode.getLevelModeEnum().equals(LevelModeEnum.FontSizeMode)){
+        LevelConverter levelConverter;
+        if (Config.configProperties.getLevelMode().getLevelModeEnum().equals(LevelModeEnum.FontSizeMode)) {
             levelConverter = new FontSizeConverter();
-        }else if(Config.levelMode.getLevelModeEnum().equals(LevelModeEnum.ChapterMode)){
+        } else if (Config.configProperties.getLevelMode().getLevelModeEnum().equals(LevelModeEnum.ChapterMode)) {
             levelConverter = new LevelRegexConveter();
-        }else {
+        } else {
             levelConverter = new RegexFontLevelConverter();
         }
         return levelConverter.convertFontSize2Leve(filteredLineTextPros);
@@ -86,7 +95,7 @@ public class PdfUtils {
         Map<Float, Integer> fontSizeCountMap = new TreeMap<>((a, b) -> -a.compareTo(b));
         //获取文字大小的策略
         TextExtractionStrategyFindBodySize strategyWithSize = new TextExtractionStrategyFindBodySize(
-                fontSizeCountMap);
+            fontSizeCountMap);
         //取5张作为样本
         for (int i = 0; i < 5; i++) {
             //跳过第一页
@@ -107,7 +116,8 @@ public class PdfUtils {
     }
 
     public static void createBookmarks(List<BookmarkWithLevel> booksmarks, PdfReader reader,
-                                       String dest) throws Exception {
+        String dest) throws Exception {
+
         Document document = new Document();
         PdfCopy copy = new PdfCopy(document, new FileOutputStream(dest));
         document.open();
@@ -124,7 +134,7 @@ public class PdfUtils {
         for (BookmarkWithLevel bookMark : booksmarks) {
             //*1.1f是想上面露一点，要不太贴着文字了。
             action = PdfAction.gotoLocalPage(bookMark.getPageNum(), new PdfDestination(
-                    PdfDestination.XYZ, -1, bookMark.getYOffset() * 1.05f, 0), copy);
+                PdfDestination.XYZ, -1, bookMark.getYOffset() * 1.05f, 0), copy);
             if (bookMark.getParent() != null) {
                 parent = maps.get(bookMark.getParent());
             } else {
@@ -144,11 +154,11 @@ public class PdfUtils {
      * 生成书签之后进行过滤
      *
      * @param bookmarks x
-     * @param regex     x
+     * @param regex x
      * @throws Exception x
      */
     public static void converterBookmarks(List<HashMap<String, Object>> bookmarks, String regex)
-            throws Exception {
+        throws Exception {
 
         List<HashMap<String, Object>> bookmarkToRemove = Lists.newArrayList();
         for (HashMap<String, Object> bookmark : bookmarks) {
@@ -163,12 +173,13 @@ public class PdfUtils {
         try {
             PdfReader reader = new PdfReader(inputFile);
             PdfStamper stamper = new PdfStamper(reader, new FileOutputStream(
-                    outputFile));
+                outputFile));
             int total = reader.getNumberOfPages() + 1;
             URL resource = Resources.getResource(imageFile);
             Image image = Image.getInstance(resource);
 
-            float imageWith = reader.getPageSize(2).getWidth() * 0.12f;
+            int totalPage = reader.getNumberOfPages();
+            float imageWith = reader.getPageSize(30).getWidth() * 0.12f;
             image.scaleToFit(imageWith, imageWith);
             // 图片位置
 
@@ -176,7 +187,8 @@ public class PdfUtils {
             PdfGState gs1 = new PdfGState();
             for (int i = 1; i < total; i++) {
                 image.setAbsolutePosition(
-                        reader.getPageSize(i).getWidth() - image.getPlainWidth() * 1.2f, 0+image.getPlainHeight()*0.1f);
+                    reader.getPageSize(i).getWidth() - image.getPlainWidth() * 1.33f,
+                    0 + image.getPlainHeight() * 0.4f);
                 over = stamper.getOverContent(i);
                 over.setGState(gs1);
                 over.addImage(image);

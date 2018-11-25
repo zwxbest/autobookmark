@@ -16,7 +16,7 @@ import javafx.application.Platform;
 public class Starter {
 
     public static void main(String[] args) throws Exception  {
-        File srcFile= Config.pdfFile;
+        File srcFile= Config.configProperties.getPdfFile();
         String temp=srcFile.getParent()+"\\"+srcFile.getName().replaceAll("\\.pdf","").concat("temp").concat(".pdf");
         String dest=srcFile.getParent()+"\\"+srcFile.getName().replaceAll("\\.pdf","").concat("-nizouba.com(你走吧)").concat(".pdf");
 

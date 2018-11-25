@@ -1,16 +1,23 @@
 package com.nizouba.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.nizouba.Starter;
+import com.nizouba.config.LastConfig;
 import com.nizouba.consts.RegexConsts;
+import com.nizouba.core.BodySizeMode;
+import com.nizouba.core.BodySizeMode.BodySizeEnum;
 import com.nizouba.core.ExtractRule;
 import com.nizouba.core.LevelMode;
 import com.nizouba.core.LevelMode.LevelModeEnum;
 import com.nizouba.core.config.Config;
+import com.nizouba.event.FxEventBus;
 import java.io.File;
 import java.net.URL;
+import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -23,7 +30,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.stage.Stage;
-import lombok.Getter;
 import lombok.Setter;
 
 /**
@@ -54,11 +60,10 @@ public class HandlerDialogController implements Initializable {
     @FXML
     private TextField extractField;
 
+    @FXML
+    private ComboBox compareCombox;
+
     private String textField = "[0-9.]+";
-
-    @Setter
-    private String fileName;
-
 
     @FXML
     private void extractComboxChanged(final ActionEvent event) {
@@ -83,15 +88,26 @@ public class HandlerDialogController implements Initializable {
 
     @FXML
     private void handleConfirmAction(final ActionEvent event) throws Exception {
-        if (bodyFontField.isVisible()) {
+        //保存选择的项
+        LastConfig.updateProperties("lastConfig", JSON.toJSONString(Config.configProperties));
+        //正文字体选择
+        int bodySizeIndex = bodyFontCombox.getSelectionModel().getSelectedIndex();
+        BodySizeMode bodySizeMode = new BodySizeMode();
+        if (bodySizeIndex == 0) {
+            bodySizeMode.setBodySizeEnum(BodySizeEnum.AI);
+        } else {
+            bodySizeMode.setBodySizeEnum(BodySizeMode.BodySizeEnum.CUSTOM);
             String bodyFontSize = bodyFontField.getText();
             try {
-                Config.bodySize = Float.valueOf(bodyFontSize);
+                bodySizeMode.setBodySize(Float.valueOf(bodyFontSize));
             } catch (NumberFormatException e) {
                 alertBodyFont();
                 return;
             }
         }
+        Config.configProperties.setBodySizeMode(bodySizeMode);
+        //标签字体对照
+        Config.configProperties.setCompareSelect(compareCombox.getSelectionModel().getSelectedIndex());
         ExtractRule extractRule = new ExtractRule();
         if (extractCombox.getSelectionModel().getSelectedIndex() == 0) {
             extractRule.setAddMarkRegex(false);
@@ -99,7 +115,7 @@ public class HandlerDialogController implements Initializable {
             extractRule.setAddMarkRegex(true);
             extractRule.setExtractRegex(extractField.getText());
         }
-        Config.extractRule = extractRule;
+        Config.configProperties.setExtractRule(extractRule);
         LevelMode levelMode = new LevelMode();
         int levelSelectedIndex = levelCombox.getSelectionModel().getSelectedIndex();
         if (levelSelectedIndex == 0) {
@@ -111,25 +127,28 @@ public class HandlerDialogController implements Initializable {
             levelMode.setLevelModeEnum(LevelModeEnum.MixMode);
             levelMode.setLevelRegex(levelField.getText());
         }
-        Config.levelMode = levelMode;
+        Config.configProperties.setLevelMode(levelMode);
         Node source = (Node) event.getSource();
         Stage stage = (Stage) source.getScene().getWindow();
         stage.close();
+        LastConfig.updateProperties("lastConfig",JSON.toJSONString(Config.configProperties));
         startHandle();
     }
 
-    private void startHandle(){
+    private void startHandle() {
+        FxEventBus.eventBus.post(true);
         ExecutorService executorService = Executors.newSingleThreadExecutor();
-        executorService.submit(()->{
+        executorService.submit(() -> {
             try {
-                String[] args = new String[]{"-f", Config.pdfFile.getPath()};
-                Starter.main(args);
-            }catch (Exception e){
-                Alert alert = new Alert(AlertType.ERROR);
-                alert.setTitle("出错了");
-                alert.setHeaderText(null);
-                alert.setContentText(e.getMessage());
-                alert.showAndWait();
+                Starter.main(null);
+            } catch (Exception e) {
+                Platform.runLater(()->{
+                    Alert alert = new Alert(AlertType.ERROR);
+                    alert.setTitle("出错了");
+                    alert.setHeaderText(null);
+                    alert.setContentText(e.getMessage());
+                    alert.showAndWait();
+                });
             }
         });
 
@@ -152,14 +171,31 @@ public class HandlerDialogController implements Initializable {
                 }
             }
         });
-        bodyFontCombox.getSelectionModel().selectFirst();
-        openLabel.setText(fileName);
-        openLabel.setTooltip(new Tooltip(fileName));
+        bodyFontCombox.getSelectionModel().select(Config.configProperties.getBodySizeMode().getBodySizeEnum().getIndex());
+        openLabel.setText(Config.configProperties.getPdfFile().getName());
+        openLabel.setTooltip(new Tooltip(Config.configProperties.getPdfFile().getName()));
+        bodyFontCombox.getSelectionModel().select(Config.configProperties.getBodySizeMode().getBodySizeEnum().getIndex());
+        if(Config.configProperties.getBodySizeMode().getBodySizeEnum().equals(BodySizeEnum.CUSTOM)){
+            bodyFontField.setVisible(true);
+            bodyFontField.setText(String.valueOf(Config.configProperties.getBodySizeMode().getBodySize()));
+        }
         extractCombox.getItems().addAll("字号模式", "字号章节模式");
-        extractCombox.getSelectionModel().select(1);
-        extractField.setText(RegexConsts.BOOKMARK_START_REGEX);
+        extractCombox.getSelectionModel().select(Config.configProperties.getExtractRule().isAddMarkRegex()?1:0);
+        if(Config.configProperties.getExtractRule().addMarkRegex){
+            extractField.setVisible(true);
+            extractField.setText(RegexConsts.BOOKMARK_START_REGEX);
+        }else {
+            extractField.setVisible(false);
+        }
         levelCombox.getItems().addAll("字号模式", "章节模式", "字号章节模式");
-        levelCombox.getSelectionModel().select(1);
-        levelField.setText(RegexConsts.LEVEL_REGEX);
+        levelCombox.getSelectionModel().select(Config.configProperties.getLevelMode().getLevelModeEnum().getCode());
+        if(Config.configProperties.getLevelMode().getLevelModeEnum().equals(LevelModeEnum.FontSizeMode)){
+            levelField.setVisible(false);
+        }else {
+            levelField.setVisible(true);
+            levelField.setText(RegexConsts.LEVEL_REGEX);
+        }
+        compareCombox.getItems().addAll("首字字号","最大字号");
+        compareCombox.getSelectionModel().select(Config.configProperties.getCompareSelect());
     }
 }

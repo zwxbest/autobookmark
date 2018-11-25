@@ -10,7 +10,12 @@ import lombok.Setter;
 /**
  * @author zhangweixiao
  */
-public class Config {
-    public static ConfigProperties configProperties;
-
+@Getter
+@Setter
+public class ConfigProperties {
+    public File pdfFile;
+    public BodySizeMode bodySizeMode;
+    public LevelMode levelMode;
+    public ExtractRule extractRule;
+    public  int compareSelect;
 }
