@@ -187,8 +187,8 @@ public class PdfUtils {
             PdfGState gs1 = new PdfGState();
             for (int i = 1; i < total; i++) {
                 image.setAbsolutePosition(
-                    reader.getPageSize(i).getWidth() - image.getPlainWidth() * 1.33f,
-                    0 + image.getPlainHeight() * 0.4f);
+                    reader.getPageSize(i).getWidth() - image.getPlainWidth() * 1.1f,
+                    0 + image.getPlainHeight() * 0.1f);
                 over = stamper.getOverContent(i);
                 over.setGState(gs1);
                 over.addImage(image);

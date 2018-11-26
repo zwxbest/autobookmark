@@ -69,14 +69,24 @@ public class HandlerDialogController implements Initializable {
     private void extractComboxChanged(final ActionEvent event) {
         ComboBox combox = (ComboBox) event.getSource();
         int selectIndex = extractCombox.getSelectionModel().getSelectedIndex();
-        extractField.setVisible(selectIndex == 1);
+        if(selectIndex == 1){
+            extractField.setVisible(true);
+            extractField.setText(RegexConsts.BOOKMARK_START_REGEX);
+        }else {
+            extractField.setVisible(false);
+        }
     }
 
     @FXML
     private void levelComboxChanged(final ActionEvent event) {
         ComboBox combox = (ComboBox) event.getSource();
         int selectIndex = levelCombox.getSelectionModel().getSelectedIndex();
-        levelField.setVisible(selectIndex != 0);
+        if(selectIndex!=0){
+            levelField.setVisible(true);
+            levelField.setText(RegexConsts.LEVEL_REGEX);
+        }else {
+            levelField.setVisible(false);
+        }
     }
 
     @FXML
