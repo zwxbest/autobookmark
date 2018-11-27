@@ -23,8 +23,8 @@ public class Starter {
         PdfReader reader = new PdfReader(srcFile.getPath());
         List<BookmarkWithLevel> bookmarkWithLevels = PdfUtils.getBookmarkWithLevel(reader);
         //写入书签
-        PdfUtils.createBookmarks(bookmarkWithLevels,reader,temp);
-        PdfUtils.genWaterMark(temp,dest,"nizouba.png");
+        PdfUtils.createBookmarks(bookmarkWithLevels,reader,dest);
+//        PdfUtils.genWaterMark(temp,dest,"nizouba.png");
         File tempFile = new File(temp);
         if(tempFile.exists()){
             tempFile.delete();

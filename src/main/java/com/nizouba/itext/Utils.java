@@ -28,7 +28,7 @@ public class Utils {
      * @return
      */
     public static float floatRound(float num, int save) {
-        int base = save * 10;
-        return Math.round(num * base) / base;
+        double base = Math.pow(10,save);
+        return (float) (Math.round(num * base) / base);
     }
 }
