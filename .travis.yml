@@ -3,4 +3,3 @@ sudo: false
 jdk:
   - oraclejdk9
   - oraclejdk8
-  - oraclejdk7
