@@ -1,7 +1,6 @@
 package com.nizouba.utils;
 
 import com.google.common.collect.Lists;
-import com.google.common.eventbus.EventBus;
 import com.google.common.io.Resources;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.Image;
@@ -11,7 +10,6 @@ import com.itextpdf.text.pdf.parser.TextRenderInfo;
 import com.itextpdf.text.pdf.parser.Vector;
 import com.nizouba.consts.RegexConsts;
 import com.nizouba.controller.MainController;
-import com.nizouba.core.BodySizeMode;
 import com.nizouba.core.BodySizeMode.BodySizeEnum;
 import com.nizouba.core.BookmarkFilterHandler;
 import com.nizouba.core.LevelMode.LevelModeEnum;

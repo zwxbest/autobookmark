@@ -11,9 +11,8 @@ import com.nizouba.core.LevelMode;
 import com.nizouba.core.LevelMode.LevelModeEnum;
 import com.nizouba.core.config.Config;
 import com.nizouba.event.FxEventBus;
-import java.io.File;
+
 import java.net.URL;
-import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -24,13 +23,11 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.stage.Stage;
-import lombok.Setter;
 
 /**
  * 打开文件之后的弹窗，显示处理选项

@@ -8,11 +8,8 @@ import com.nizouba.event.FxEventBus;
 import java.awt.Desktop;
 import java.io.File;
 import java.net.URL;
-import java.text.DecimalFormat;
-import java.text.Format;
 import java.util.ResourceBundle;
 import com.nizouba.core.config.Config;
-import javafx.application.Platform;
 import javafx.beans.property.SimpleFloatProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -23,20 +20,13 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.ProgressIndicator;
-import javafx.scene.input.InputEvent;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.util.converter.DoubleStringConverter;
-import javafx.util.converter.FormatStringConverter;
 
 public class MainController implements Initializable {
 

@@ -1,14 +1,10 @@
 package com.nizouba.level;
 
-import com.google.common.collect.Lists;
-import com.nizouba.core.config.Config;
 import com.nizouba.dto.BookmarkWithLevel;
 import com.nizouba.itext.LineTextPros;
 import com.nizouba.utils.LevelConverterUtil;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * @author zhangweixiao
