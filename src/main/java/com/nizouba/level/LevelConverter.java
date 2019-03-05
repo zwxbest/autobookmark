@@ -2,7 +2,7 @@ package com.nizouba.level;
 
 import com.nizouba.dto.BookmarkWithLevel;
 import com.nizouba.itext.LineTextPros;
-import com.nizouba.utils.LevelConverterUtil;
+
 import java.util.List;
 
 /**

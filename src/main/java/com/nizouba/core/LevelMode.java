@@ -32,7 +32,7 @@ public class LevelMode {
      */
     @Getter
     @AllArgsConstructor
-    public static enum LevelModeEnum {
+    public enum LevelModeEnum {
 
         /**
          * 模式

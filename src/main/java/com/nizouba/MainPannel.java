@@ -1,6 +1,5 @@
 package com.nizouba;
 
-import com.nizouba.config.LastConfig;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;

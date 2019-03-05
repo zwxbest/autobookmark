@@ -17,7 +17,7 @@ public class BodySizeMode {
 
     @Getter
     @AllArgsConstructor
-    public static enum  BodySizeEnum{
+    public enum  BodySizeEnum{
 
         /**
          *
