@@ -12,22 +12,9 @@ import java.util.stream.Collectors;
  */
 public class LevelConverterUtil {
 
-    public static BookmarkWithLevel convertFontSize2Level(LineTextPros lineTextPros) {
-        BookmarkWithLevel bookmarkWithLevel = new BookmarkWithLevel();
-        bookmarkWithLevel.setTitle(lineTextPros.getLineText());
-        bookmarkWithLevel.setYOffset(lineTextPros.getYTop());
-        bookmarkWithLevel.setFontSize(lineTextPros.getMaxFontSize());
-        bookmarkWithLevel.setPageNum(lineTextPros.getPageNo());
-        String numberTitle = convertChsToDig(bookmarkWithLevel.getTitle());
-        bookmarkWithLevel.setTitle(numberTitle);
-        return bookmarkWithLevel;
-    }
+    static Map<String, Integer> digs = Maps.newLinkedHashMap();
 
-    private static String convertChsToDig(String chs) {
-        if (!chs.startsWith("第")) {
-            return chs;
-        }
-        Map<String, Integer> digs = Maps.newLinkedHashMap();
+    static {
         digs.put("一", 1);
         digs.put("二", 2);
         digs.put("三", 3);
@@ -67,6 +54,24 @@ public class LevelConverterUtil {
         digs.put("三十七", 37);
         digs.put("三十八", 38);
         digs.put("三十九", 39);
+    }
+
+
+    public static BookmarkWithLevel convertFontSize2Level(LineTextPros lineTextPros) {
+        BookmarkWithLevel bookmarkWithLevel = new BookmarkWithLevel();
+        bookmarkWithLevel.setTitle(lineTextPros.getLineText());
+        bookmarkWithLevel.setYOffset(lineTextPros.getYTop());
+        bookmarkWithLevel.setFontSize(lineTextPros.getMaxFontSize());
+        bookmarkWithLevel.setPageNum(lineTextPros.getPageNo());
+        String numberTitle = convertChsToDig(bookmarkWithLevel.getTitle());
+        bookmarkWithLevel.setTitle(numberTitle);
+        return bookmarkWithLevel;
+    }
+
+    private static String convertChsToDig(String chs) {
+        if (!chs.startsWith("第")) {
+            return chs;
+        }
         List<String> collect = digs.keySet().stream().collect(Collectors.toList());
         for (int i = collect.size() - 1; i >= 0; i--) {
             int index = chs.indexOf(collect.get(i));

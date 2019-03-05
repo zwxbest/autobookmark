@@ -16,6 +16,8 @@ public class LineTextExtractionStrategy implements TextExtractionStrategy {
 
     private List<LineTextPros> lineTextProsList = Lists.newArrayList();
 
+    private float lastMinYBottomOfLine = Float.MAX_VALUE;
+
     private float lastYBottom = -1f;
 
     private StringBuilder lineText = new StringBuilder();
@@ -62,11 +64,12 @@ public class LineTextExtractionStrategy implements TextExtractionStrategy {
     public void renderText(TextRenderInfo renderInfo) {
 
         String blockText = renderInfo.getText();
-        float yBottom = Utils.floatRound(renderInfo.getBaseline().getStartPoint().get(Vector.I2), 1);
+        float yBottom = Utils.floatRound(renderInfo.getBaseline().getStartPoint().get(Vector.I2), 0);
         float yTop = renderInfo.getAscentLine().getEndPoint().get(Vector.I2);
         float fontSize = Utils.floatRound(Utils.getFontSize(renderInfo), 1);
 
-        if (lastYBottom != yBottom) {
+
+        if (lastYTop != -1f && yTop < lastMinYBottomOfLine ) {
             //保存上一行的数据
             addLineToList();
             //准备新的一行
@@ -80,8 +83,9 @@ public class LineTextExtractionStrategy implements TextExtractionStrategy {
             maxFontSize = fontSize;
         }
         lineText.append(blockText);
-        lastYBottom = yBottom;
+//        lastYBottom = yBottom;
         lastYTop = yTop;
+        lastMinYBottomOfLine =  yBottom < lastMinYBottomOfLine? yBottom:lastMinYBottomOfLine;
     }
 
     @Override

@@ -63,7 +63,7 @@ public class LevelRegexConveter  implements LevelConverter{
             return false;
         }
         for (int i = 0; i < maybeParnetSize; i++) {
-            if (!childNumberInTitles.get(i).equals(maybeParentNumberInTitles.get(i))) {
+            if (!childNumberInTitles.get(i).trim().equals(maybeParentNumberInTitles.get(i).trim())) {
                 return false;
             }
         }
