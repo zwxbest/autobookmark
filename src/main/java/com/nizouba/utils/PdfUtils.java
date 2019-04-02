@@ -8,7 +8,7 @@ import com.itextpdf.text.pdf.*;
 import com.itextpdf.text.pdf.parser.PdfTextExtractor;
 import com.itextpdf.text.pdf.parser.TextRenderInfo;
 import com.itextpdf.text.pdf.parser.Vector;
-import com.nizouba.consts.RegexConsts;
+import com.nizouba.consts.Consts;
 import com.nizouba.controller.MainController;
 import com.nizouba.core.BodySizeMode.BodySizeEnum;
 import com.nizouba.core.BookmarkFilterHandler;
@@ -57,19 +57,17 @@ public class PdfUtils {
             //处理书签业务逻辑
             BookmarkFilterHandler handler = new BookmarkFilterHandler(lineTextProsList);
             filteredLineTextPros.addAll(handler.filter(lineTextPros -> {
-
                 //是根据首字号还是最大字号
                 boolean b =
                     Config.configProperties.getCompareSelect() == 0 ? lineTextPros.getFirstBlockFontSize() > bodySize
                         : lineTextPros.getMaxFontSize() > bodySize;
                 if (Config.configProperties.getExtractRule().addMarkRegex) {
-                    b &= lineTextPros.getLineText().matches(RegexConsts.BOOKMARK_START_REGEX);
+                    b &= lineTextPros.getLineText().matches(Consts.BOOKMARK_START_REGEX);
                 }
                 return b;
             }));
             //todo：调用progressBar发送进度
             float progress = Math.round(i / (float) (numberOfPages) * 100) / 100f - 0.01f;
-            System.out.println(Math.round(i / (float) (numberOfPages) * 100) / 100f - 0.01f);
             Platform.runLater(() -> MainController.progressValue.set(progress));
         }
         LevelConverter levelConverter;

@@ -3,6 +3,7 @@ package com.nizouba.controller;
 import com.alibaba.fastjson.JSON;
 import com.google.common.eventbus.Subscribe;
 import com.nizouba.config.LastConfig;
+import com.nizouba.consts.Consts;
 import com.nizouba.core.config.ConfigProperties;
 import com.nizouba.event.FxEventBus;
 import java.awt.Desktop;
@@ -65,7 +66,8 @@ public class MainController implements Initializable {
         if(button.getId().equals("openFolderButton")){
             Desktop.getDesktop().open(new File(Config.configProperties.getPdfFile().getParent()));
         }else if(button.getId().equals("openFileButton")){
-            String dest=Config.configProperties.getPdfFile().getParent()+"\\"+Config.configProperties.getPdfFile().getName().replaceAll("\\.pdf","").concat("-nizouba.com(你走吧)").concat(".pdf");
+            String dest=Config.configProperties.getPdfFile().getParent()+"\\"+Config.configProperties.getPdfFile().getName().replaceAll("\\.pdf","").concat(
+                Consts.MARK_TEXT).concat(".pdf");
             Desktop.getDesktop().open(new File(dest));
         }
     }

@@ -3,7 +3,7 @@ package com.nizouba.controller;
 import com.alibaba.fastjson.JSON;
 import com.nizouba.Starter;
 import com.nizouba.config.LastConfig;
-import com.nizouba.consts.RegexConsts;
+import com.nizouba.consts.Consts;
 import com.nizouba.core.BodySizeMode;
 import com.nizouba.core.BodySizeMode.BodySizeEnum;
 import com.nizouba.core.ExtractRule;
@@ -68,7 +68,7 @@ public class HandlerDialogController implements Initializable {
         int selectIndex = extractCombox.getSelectionModel().getSelectedIndex();
         if(selectIndex == 1){
             extractField.setVisible(true);
-            extractField.setText(RegexConsts.BOOKMARK_START_REGEX);
+            extractField.setText(Consts.BOOKMARK_START_REGEX);
         }else {
             extractField.setVisible(false);
         }
@@ -80,7 +80,7 @@ public class HandlerDialogController implements Initializable {
         int selectIndex = levelCombox.getSelectionModel().getSelectedIndex();
         if(selectIndex!=0){
             levelField.setVisible(true);
-            levelField.setText(RegexConsts.LEVEL_REGEX);
+            levelField.setText(Consts.LEVEL_REGEX);
         }else {
             levelField.setVisible(false);
         }
@@ -190,7 +190,7 @@ public class HandlerDialogController implements Initializable {
         extractCombox.getSelectionModel().select(Config.configProperties.getExtractRule().isAddMarkRegex()?1:0);
         if(Config.configProperties.getExtractRule().addMarkRegex){
             extractField.setVisible(true);
-            extractField.setText(RegexConsts.BOOKMARK_START_REGEX);
+            extractField.setText(Consts.BOOKMARK_START_REGEX);
         }else {
             extractField.setVisible(false);
         }
@@ -200,7 +200,7 @@ public class HandlerDialogController implements Initializable {
             levelField.setVisible(false);
         }else {
             levelField.setVisible(true);
-            levelField.setText(RegexConsts.LEVEL_REGEX);
+            levelField.setText(Consts.LEVEL_REGEX);
         }
         compareCombox.getItems().addAll("首字字号","最大字号");
         compareCombox.getSelectionModel().select(Config.configProperties.getCompareSelect());

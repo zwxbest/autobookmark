@@ -68,6 +68,12 @@ public class LineTextExtractionStrategy implements TextExtractionStrategy {
         float yTop = renderInfo.getAscentLine().getEndPoint().get(Vector.I2);
         float fontSize = Utils.floatRound(Utils.getFontSize(renderInfo), 1);
 
+        if(pageNo == 9){
+            System.out.println("blockText "+blockText);
+            System.out.println("yBottom "+yBottom);
+            System.out.println("yTop "+yTop);
+            System.out.println("lastMinYBottomOfLine "+lastMinYBottomOfLine);
+        }
 
         if (lastYTop != -1f && yTop < lastMinYBottomOfLine ) {
             //保存上一行的数据
@@ -83,7 +89,6 @@ public class LineTextExtractionStrategy implements TextExtractionStrategy {
             maxFontSize = fontSize;
         }
         lineText.append(blockText);
-//        lastYBottom = yBottom;
         lastYTop = yTop;
         lastMinYBottomOfLine =  yBottom < lastMinYBottomOfLine? yBottom:lastMinYBottomOfLine;
     }
