@@ -18,9 +18,6 @@ public class Starter {
 
     public static void main(String[] args) throws Exception {
         File srcFile = Config.configProperties.getPdfFile();
-        String temp =
-            srcFile.getParent() + "\\" + srcFile.getName().replaceAll("\\.pdf", "").concat("temp")
-                .concat(".pdf");
         String dest =
             srcFile.getParent() + "\\" + srcFile.getName().replaceAll("\\.pdf", "").concat(
                 Consts.MARK_TEXT).concat(".pdf");
@@ -28,12 +25,7 @@ public class Starter {
         PdfReader reader = new PdfReader(srcFile.getPath());
         List<BookmarkWithLevel> bookmarkWithLevels = PdfUtils.getBookmarkWithLevel(reader);
         //写入书签
-        PdfUtils.createBookmarks(bookmarkWithLevels, reader, temp);
-        PdfUtils.genWaterMark(temp, dest, "nizouba.png");
-        File tempFile = new File(temp);
-        if (tempFile.exists()) {
-            tempFile.delete();
-        }
+        PdfUtils.createBookmarks(bookmarkWithLevels, reader, dest);
         System.out.println("添加书签成功");
         //完成
         Platform.runLater(() -> MainController.progressValue.set(1f));
