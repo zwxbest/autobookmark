@@ -56,6 +56,25 @@ public class Tools {
         System.out.println("复制书签成功");
     }
 
+    private static void handleBookmarkInherite(List<HashMap<String, Object>> list) {
+        for (HashMap<String, Object> map : list) {
+            Object pageObj = map.get("Page");
+            if (pageObj != null) {
+                String page = pageObj.toString();
+                String[] replaceStrs = new String[]{"FitBH", "FitBV", "FitH", "FitV", "FitR", "FitB", "Fit"};
+                for (String replaceStr : replaceStrs) {
+                    page = page.replace(replaceStr, "XYZ");
+                }
+                map.put("Page", page);
+            }
+
+            Object kids = map.get("Kids");
+            if (kids != null) {
+                handleBookmarkInherite((List<HashMap<String, Object>>) kids);
+            }
+        }
+    }
+
     /**
      * 缩放等级改为继承
      *
@@ -66,14 +85,7 @@ public class Tools {
         File srcFile = new File(srcName);
         PdfReader reader = new PdfReader(srcFile.getPath());
         List<HashMap<String, Object>> list = SimpleBookmark.getBookmark(reader);
-        for (HashMap<String, Object> map : list) {
-            String page = map.get("Page").toString();
-            String[] replaceStrs = new String[]{"FIT","FITH","FITH","FITV","FITR","FITB","FITBH","FITBV"};
-            for (String replaceStr : replaceStrs) {
-                page = page.replace(replaceStr,"");
-            }
-            map.put("Page",page);
-        }
+        handleBookmarkInherite(list);
         String dest = srcName.replace(".pdf", "") + "-tuoawzi.pdf";
         PdfStamper stamper = new PdfStamper(reader, new FileOutputStream(dest));
         stamper.setOutlines(list);
@@ -84,7 +96,7 @@ public class Tools {
 
     static class Test1 {
         public static void main(String[] args) throws Exception {
-            makeBookMarkInherited("E:\\PDF\\Node.js\\深入浅出Node.js.pdf");
+            makeBookMarkInherited("E:\\PDF\\Node.js\\了不起的Node  js  将JavaScript进行到底.pdf");
         }
     }
 }
