@@ -17,7 +17,6 @@ public class MainPannel extends javafx.application.Application {
         primaryStage.getIcons().add(new Image("nizouba.jpg"));
         primaryStage.resizableProperty().setValue(Boolean.FALSE);
 
-
         primaryStage.show();
     }
 

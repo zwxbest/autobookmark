@@ -29,7 +29,6 @@ public class Starter {
         List<BookmarkWithLevel> bookmarkWithLevels = PdfUtils.getBookmarkWithLevel(reader);
         //写入书签
         PdfUtils.createBookmarks(bookmarkWithLevels, reader, temp);
-        PdfUtils.genWaterMark(temp, dest, "nizouba.png");
         File tempFile = new File(temp);
         if (tempFile.exists()) {
             tempFile.delete();
