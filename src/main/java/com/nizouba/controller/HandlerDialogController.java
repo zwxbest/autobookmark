@@ -154,6 +154,7 @@ public class HandlerDialogController implements Initializable {
                     alert.setTitle("出错了");
                     alert.setHeaderText(null);
                     alert.setContentText(e.getMessage());
+                    e.printStackTrace();
                     alert.showAndWait();
                 });
             }

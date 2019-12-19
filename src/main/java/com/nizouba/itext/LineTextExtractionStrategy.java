@@ -52,6 +52,7 @@ public class LineTextExtractionStrategy implements TextExtractionStrategy {
         lineTextPros.setFirstBlockFontSize(firstBlockFontSize);
         lineTextPros.setYBottom(lastYBottom);
         lineTextPros.setYTop(lastYTop);
+        lineTextPros.setPageNo(pageNo);
         lineTextProsList.add(lineTextPros);
     }
 
