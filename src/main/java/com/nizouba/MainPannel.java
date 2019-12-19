@@ -14,9 +14,7 @@ public class MainPannel extends javafx.application.Application {
         Parent root = FXMLLoader.load(getClass().getClassLoader().getResource("fxml/mainPannel.fxml"));
         primaryStage.setTitle("ZMark-PDF书签生成工具");
         primaryStage.setScene(new Scene(root, 800, 600));
-        primaryStage.getIcons().add(new Image("nizouba.jpg"));
         primaryStage.resizableProperty().setValue(Boolean.FALSE);
-
         primaryStage.show();
     }
 
